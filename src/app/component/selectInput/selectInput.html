@@ -1,0 +1,67 @@
+<!-- <label for="countries" class="block mb-2.5 text-xs uppercase text-heading">
+    {{ label }}
+</label>
+
+<select class="block w-full px-3 py-2.5 bg-neutral-secondary-medium
+         border border-default-medium text-heading text-sm
+         rounded-base focus:ring-brand focus:border-brand shadow-xs" [disabled]="disabled" [value]="value"
+    (change)="onSelectChange($event)">
+    <option value="" disabled>
+        {{ placeholder }}
+    </option>
+
+    <option *ngFor="let item of options" [value]="item.value">
+        {{ item.label }}
+    </option>
+</select> -->
+<label
+    class="block mb-2 text-sm font-medium text-gray-700">
+    {{ label }}
+</label>
+
+<select
+    [disabled]="disabled"
+    [value]="value"
+    (change)="onSelectChange($event)"
+    class="
+        w-full
+        px-4
+        py-2.5
+
+        text-sm
+        text-gray-900
+
+        bg-white
+        border
+        border-gray-300
+        rounded-lg
+
+        shadow-sm
+
+        transition-all
+        duration-200
+
+        hover:border-gray-400
+
+        focus:outline-none
+        focus:ring-2
+        focus:ring-blue-500/20
+        focus:border-blue-500
+
+        disabled:bg-gray-100
+        disabled:text-gray-400
+        disabled:cursor-not-allowed
+        disabled:border-gray-200
+    ">
+
+    <option value="" disabled>
+        {{ placeholder }}
+    </option>
+
+    <option
+        *ngFor="let item of options"
+        [value]="item.value">
+        {{ item.label }}
+    </option>
+
+</select>

@@ -1,0 +1,38 @@
+<div class="flex items-center gap-2">
+    <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search..."
+        (keyup.enter)="onSearch()"
+        class="h-10 px-3 ps-3 bg-neutral-secondary-medium
+               border border-default-medium rounded-base
+               text-heading text-sm leading-10
+               focus:ring-brand focus:border-brand
+               block w-full placeholder:text-body"
+    />
+
+    <ng-container *ngIf="showDateFilter">
+        <input
+            type="date"
+            [(ngModel)]="fromDate"
+            class="h-10 px-3 ps-3 bg-neutral-secondary-medium
+                   border border-default-medium rounded-base
+                   text-heading text-sm leading-10
+                   focus:ring-brand focus:border-brand
+                   block w-full"
+        />
+
+        <input
+            type="date"
+            [(ngModel)]="toDate"
+            class="h-10 px-3 ps-3 bg-neutral-secondary-medium
+                   border border-default-medium rounded-base
+                   text-heading text-sm leading-10
+                   focus:ring-brand focus:border-brand
+                   block w-full"
+        />
+    </ng-container>
+
+    <app-button class="h-10" title="Search" icon="search" (click)="onSearch()" />
+    <app-button-transparant class="h-10" title="Reset" (click)="onReset()" />
+</div>

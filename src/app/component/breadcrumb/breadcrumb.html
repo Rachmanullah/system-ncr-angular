@@ -1,0 +1,9 @@
+<nav class="flex p-3 bg-neutral-secondary-medium border border-default-medium rounded-base mb-4 ">
+  <ol class="inline-flex items-center space-x-2">
+    <li *ngFor="let item of items; let last = last" class="inline-flex items-center text-sm font-medium text-body">
+      <lucide-icon *ngIf="item.icon" [name]="item.icon" class="w-4 h-4 mr-2"></lucide-icon>
+      {{ item.title }}
+      <lucide-icon *ngIf="!last" [name]="item.separatorIcon || 'chevron-right'" class="w-4 h-4 mx-1"></lucide-icon>
+    </li>
+  </ol>
+</nav>

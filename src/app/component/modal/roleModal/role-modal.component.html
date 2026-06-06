@@ -1,0 +1,60 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+  <div class="w-full max-w-md bg-white rounded-xl shadow-xl p-6 animate-fade-in">
+
+    <h3 class="text-lg font-semibold mb-5 text-gray-800">
+      {{ mode === 'add' ? 'Add Role' : 'Edit Role' }}
+    </h3>
+
+    <div class="space-y-4">
+
+      <div>
+        <label class="text-sm font-medium text-gray-700">Role ID</label>
+        <input
+          type="text"
+          [(ngModel)]="form.roleId"
+          [class.border-red-500]="!!errors['roleId']"
+          class="w-full mt-1 rounded-base border px-3 py-2
+                 focus:outline-none focus:ring-2 focus:ring-brand-soft
+                 hover:border-brand-soft transition">
+                 <p *ngIf="errors['roleId']" class="text-xs text-red-600 mt-1">
+          {{ errors['roleId'] }}
+        </p>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-700">Role Name</label>
+        <input
+          type="text"
+          [(ngModel)]="form.roleName"
+          [class.border-red-500]="!!errors['roleName']"
+          class="w-full mt-1 rounded-base border px-3 py-2
+                 focus:outline-none focus:ring-2 focus:ring-brand-soft
+                 hover:border-brand-soft transition">
+                <p *ngIf="errors['roleName']" class="text-xs text-red-600 mt-1">
+          {{ errors['roleName'] }}
+        </p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        (click)="close.emit()"
+        class="px-4 py-2 text-sm rounded-base border
+               hover:bg-gray-100 active:scale-95 transition">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        (click)="save.emit(form)"
+        [disabled]="submitting"
+        class="px-5 py-2 text-sm rounded-base
+               bg-brand-soft text-fg-brand
+               hover:bg-brand hover:text-white
+               active:scale-95 transition">
+        {{ submitting ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+
+  </div>
+</div>

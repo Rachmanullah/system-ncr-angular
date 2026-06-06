@@ -1,3 +1,52 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+/* @import "flowbite";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "flowbite/src/themes/default";
+@import "flowbite/dist/flowbite.min.css"; */
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+
+:root {
+    --primary: #C8A75D;
+    --primary-hover: #B89243;
+
+    --secondary: #155dfc;
+
+    --bg-main: #F8F9FA;
+    --bg-surface: #FFFFFF;
+
+    --bg-hover: #F4F1EA;
+    --bg-active: #F5E8C7;
+    --bg-secondary: #155dfc;
+
+    --text-main: #1E1E1E;
+    --text-secondary: #FFFFFF;
+    --text-muted: #6B7280;
+
+    --border-light: #E5E7EB;
+}
+
+.dark {
+    --primary: #D4AF37;
+    --primary-hover: #F0C75E;
+
+    --secondary: #155dfc;
+
+    --bg-main: #111827;
+    --bg-surface: #1F2937;
+
+    --bg-hover: #2D3748;
+    --bg-active: #3B4452;
+
+    --text-main: #F9FAFB;
+    --text-muted: #9CA3AF;
+
+    --border-light: #374151;
+}

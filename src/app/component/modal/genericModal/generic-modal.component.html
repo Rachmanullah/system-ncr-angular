@@ -1,0 +1,67 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-5">
+      {{ title }}
+    </h3>
+
+    <div
+      class="grid gap-4"
+      [ngClass]="{
+        'grid-cols-1': !isTwoColumn,
+        'grid-cols-2': isTwoColumn
+      }"
+    >
+      <ng-container *ngFor="let field of fields">
+        <ng-container *ngIf="!(mode === 'edit' && field.hiddenOnEdit)">
+          <div
+            [ngClass]="{
+              'col-span-2': field.fullWidth
+            }"
+          >
+            <label class="text-sm font-medium text-gray-600">
+              {{ field.label }}
+            </label>
+            <input
+              *ngIf="field.type !== 'select'"
+              [type]="field.type"
+              [(ngModel)]="form[field.key]"
+              [attr.required]="field.required ? '' : null"
+              [class.border-red-500]="errors[field.key]"
+              class="w-full mt-1 rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-brand/40 transition"
+            />
+            <select
+              *ngIf="field.type === 'select'"
+              [(ngModel)]="form[field.key]"
+              [attr.required]="field.required ? '' : null"
+              [class.border-red-500]="errors[field.key]"
+              class="w-full mt-1 rounded-lg border px-3 py-2 text-sm bg-white"
+            >
+              <option value="">-- Select --</option>
+              <option *ngFor="let opt of field.options" [value]="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+            <p *ngIf="errors[field.key]" class="text-xs text-red-600 mt-1">
+              {{ errors[field.key] }}
+            </p>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button type="button" (click)="close.emit()" class="px-4 py-2 text-sm rounded-lg border">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="submitting"
+        class="px-5 py-2 text-sm rounded-lg bg-brand-soft text-fg-brand disabled:opacity-50"
+      >
+        {{ submitting ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<button
+    type="button"
+    [disabled]="disabled"
+    [class]="buttonClass"
+    [style.width]="!fullWidth ? width : null"
+    (click)="onClick.emit()">
+
+  <lucide-icon
+    *ngIf="icon"
+    [name]="icon"
+    class="w-4 h-4">
+  </lucide-icon>
+
+  <span>{{ title }}</span>
+
+</button>

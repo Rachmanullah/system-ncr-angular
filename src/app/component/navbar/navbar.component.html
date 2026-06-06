@@ -1,0 +1,62 @@
+<nav
+    class="fixed top-0 z-50 w-full bg-[var(--bg-surface)] border-b border-[var(--border-light)] backdrop-blur-md shadow-sm">
+    <div class="px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-4 px-4">
+            <div class="h-16 flex items-center px-6 border-b border-[var(--border-light)]">
+                <div
+                    class="w-10 h-10 rounded-xl bg-[var(--secondary)] flex items-center justify-center text-white font-bold">
+                    NCR
+                </div>
+
+                <div class="ml-3">
+                    <div class="font-semibold text-[var(--text-main)]">NCR System</div>
+                    <div class="text-xs text-[var(--text-muted)]">Enterprise Monitoring Platform</div>
+                </div>
+            </div>
+            <button (click)="toggleSidebar()"
+                class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-[var(--bg-hover)] transition">
+                ☰
+            </button>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="hidden sm:flex flex-col items-end leading-tight">
+                <span class="text-sm font-medium text-[var(--text-main)]">
+                    <!-- {{ user?.username }} -->
+                    Rochmanullah
+                </span>
+
+                <span class="text-xs text-[var(--text-muted)]">
+                    <!-- {{ user?.roleId }} -->
+                    Administrator
+                    <span class="mx-1 text-[var(--border-light)]">•</span>
+                    <!-- {{ server }} -->
+                </span>
+            </div>
+
+            <div class="relative">
+                <button (click)="toggleProfile()"
+                    class="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-[var(--primary)]">
+                    <img src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" />
+                </button>
+
+                <div *ngIf="profileOpen"
+                    class="absolute right-0 mt-2 w-48 bg-white border border-[var(--border-light)] rounded-xl shadow-md overflow-hidden">
+                    <a routerLink="/profile"
+                        class="flex items-center gap-3 px-4 py-2 text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition">
+                        <lucide-icon name="user" class="w-5 h-5 text-[var(--text-muted)]"></lucide-icon>
+                        Profile
+                    </a>
+
+                    <hr class="border-[var(--border-light)]" />
+
+                    <button (click)="logout()"
+                        class="w-full flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-50 transition text-left">
+                        <lucide-icon name="log-out" class="w-5 h-5"></lucide-icon>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

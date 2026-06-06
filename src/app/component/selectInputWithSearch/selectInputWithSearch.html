@@ -1,0 +1,53 @@
+<label class="block mb-2.5 text-xs uppercase text-heading">
+    {{ label }}
+</label>
+
+<div class="relative">
+    <!-- Select Display -->
+    <div
+        class="block w-full px-3 py-2.5 bg-neutral-secondary-medium
+               border border-default-medium text-heading text-sm
+               rounded-base shadow-xs cursor-pointer
+               focus:ring-brand focus:border-brand"
+        tabindex="0"
+        (click)="toggle()"
+    >
+        {{ selectedLabel || placeholder }}
+    </div>
+
+    <!-- Dropdown -->
+    <div
+        *ngIf="open"
+        class="absolute z-10 mt-1 w-full bg-white
+               border border-default-medium rounded-base
+               shadow-md"
+    >
+        <!-- Search Input (INSIDE DROPDOWN) -->
+        <div class="p-2 border-b border-default-medium">
+            <input
+                type="text"
+                class="w-full px-2 py-2 text-sm border rounded-md focus:ring-brand focus:border-brand"
+                placeholder="Search..."
+                (input)="onSearch($event)"
+            />
+        </div>
+
+        <!-- Options -->
+        <ul class="max-h-52 overflow-auto">
+            <li
+                *ngFor="let item of filteredOptions"
+                class="px-3 py-2 cursor-pointer hover:bg-neutral-100"
+                (click)="selectOption(item)"
+            >
+                {{ item.label }}
+            </li>
+
+            <li
+                *ngIf="filteredOptions.length === 0"
+                class="px-3 py-2 text-gray-400 text-sm"
+            >
+                No data found
+            </li>
+        </ul>
+    </div>
+</div>

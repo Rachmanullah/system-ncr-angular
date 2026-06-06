@@ -1,0 +1,38 @@
+<aside
+    class="fixed mt-5 top-0 left-0 z-40 w-72 h-screen bg-[var(--bg-surface)] border-r border-[var(--border-light)] shadow-lg transition-all duration-300 flex flex-col"
+    [class.-translate-x-full]="!isOpen">
+    <div class="h-14 shrink-0 mt-5"></div>
+    <div class="flex-1 overflow-y-auto px-3 py-4">
+        <ul class="space-y-1" *ngIf="menus$ | async as menus">
+            <li *ngFor="let menu of menus">
+                <a *ngIf="!menu.children" [routerLink]="menu.url"
+                    routerLinkActive="bg-[var(--bg-secondary)] text-[var(--text-secondary)]"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--text-main)] hover:bg-[var(--bg-hover)] transition-all">
+                    <lucide-icon [name]="menu.icon" class="w-5 h-5"></lucide-icon>
+                    {{ menu.title }}
+                </a>
+                <div *ngIf="menu.children">
+                    <button (click)="menu.open = !menu.open"
+                        class="w-full flex items-center justify-between px-4 py-2 rounded-lg hover:bg-[var(--bg-hover)] transition">
+                        <div class="flex items-center gap-4 text-sm font-medium">
+                            <lucide-icon [name]="menu.icon" class="w-5 h-5"></lucide-icon>
+                            {{ menu.title }}
+                        </div>
+                        <span class="transition-transform" [class.rotate-180]="menu.open">⌄</span>
+                    </button>
+                    <ul class="ml-4 mt-1 space-y-1 border-l pl-3 transition-all duration-300 ease-in-out overflow-y-auto"
+                        [class.max-h-0]="!menu.open" [class.max-h-96]="menu.open" [class.opacity-0]="!menu.open"
+                        [class.opacity-100]="menu.open">
+                        <li *ngFor="let child of menu.children">
+                            <a [routerLink]="child.url" routerLinkActive="bg-[var(--bg-secondary)] text-[var(--secondary)]"
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[var(--text-muted)] hover:text-[var(--secondary)] hover:bg-[var(--bg-hover)] transition">
+                                <lucide-icon [name]="child.icon" class="w-4 h-4"></lucide-icon>
+                                {{ child.title }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</aside>
