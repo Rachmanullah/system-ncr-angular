@@ -4,6 +4,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { AuthBase } from '../../core/class/auth.class';
 import { Router } from '@angular/router';
 import { LayoutService } from '../../service/layout.service';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
     selector: 'app-navbar',
@@ -14,22 +15,24 @@ import { LayoutService } from '../../service/layout.service';
 export class NavbarComponent implements OnInit {
     profileOpen = false;
     user: AuthBase = {
-        name: '',
+        fullname: '',
         username: '',
+        email:'',
+        position: '',
+        departmentId: 0
     };
-    server = '';
 
     constructor(
         private layout: LayoutService,
+        private authService: AuthService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
-        // this.authService.user$.subscribe(user => {
-        //     this.user = user;
-        //     const serverActive = this.authService.getActiveServer();
-        //     this.server = serverActive === 'HOC2' ||serverActive ==='HOC' ? 'HOC' : serverActive;
-        // });
+        this.authService.user$.subscribe(user => {
+            this.user = user;
+            console.log("user : ",user)
+        });
     }
 
 
@@ -42,8 +45,8 @@ export class NavbarComponent implements OnInit {
     }
 
     logout() {
-        // this.authService.logout();
-        this.router.navigate(['/login']);
+        this.authService.logout();
+        this.router.navigate(['/auth/login']);
     }
 
 }

@@ -1,7 +1,13 @@
 export interface AuthBase {
-    id?: number;
-    name: string;
+    userId?: number;
+    fullname: string;
     username: string;
+    email?: string;
+    position?: string;
+    departmentId?: number;
+    departmentName?: string;
+    roleId?: number;
+    roleName?: string;
     token?: string;
 }
 

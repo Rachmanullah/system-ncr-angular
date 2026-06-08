@@ -22,15 +22,13 @@
         <div class="flex items-center gap-4">
             <div class="hidden sm:flex flex-col items-end leading-tight">
                 <span class="text-sm font-medium text-[var(--text-main)]">
-                    <!-- {{ user?.username }} -->
-                    Rochmanullah
+                    {{ user?.username }}
                 </span>
 
                 <span class="text-xs text-[var(--text-muted)]">
-                    <!-- {{ user?.roleId }} -->
-                    Administrator
+                    {{ user?.departmentName}}
                     <span class="mx-1 text-[var(--border-light)]">•</span>
-                    <!-- {{ server }} -->
+                    {{ user?.roleName }}
                 </span>
             </div>
 

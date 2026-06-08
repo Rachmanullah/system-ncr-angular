@@ -1,10 +1,10 @@
-import { MenuItem } from "../core/class/menu.class";
+import { MenuItem } from '../core/class/menu.class';
 
 export const DUMMY_MENUS: MenuItem[] = [
   {
     title: 'Dashboard',
     icon: 'layout-dashboard',
-    url: '/dashboard'
+    url: '/dashboard',
   },
   {
     title: 'System',
@@ -13,24 +13,24 @@ export const DUMMY_MENUS: MenuItem[] = [
       {
         title: 'User Management',
         icon: 'users',
-        url: '/system/users'
+        url: '/system/users',
       },
       {
         title: 'Role Management',
         icon: 'shield',
-        url: '/system/roles'
+        url: '/system/roles',
       },
       {
         title: 'Department Management',
         icon: 'building',
-        url: '/system/department'
+        url: '/system/department',
       },
       {
         title: 'Menu Management',
         icon: 'menu',
-        url: '/system/menus'
-      }
-    ]
+        url: '/system/menus',
+      },
+    ],
   },
   {
     title: 'NCR',
@@ -39,38 +39,38 @@ export const DUMMY_MENUS: MenuItem[] = [
       {
         title: 'Create NCR',
         icon: 'file-plus',
-        url: '/ncr/create'
+        url: '/ncr/create',
       },
       {
         title: 'New Change Request',
         icon: 'list',
-        url: '/ncr/list'
+        url: '/ncr/list',
       },
       {
         title: 'Approval NCR',
         icon: 'signature',
-        url: '/ncr/approval'
+        url: '/ncr/approval',
       },
       {
         title: 'Matrix Approval',
-        icon : 'badge-check',
-        url:'/ncr/matrix'
+        icon: 'badge-check',
+        url: '/ncr/matrix',
       },
       {
         title: 'Minutes Of Meeting',
         icon: 'notebook-pen',
-        url: '/ncr/mom'
+        url: '/ncr/mom',
       },
       {
         title: 'User Acceptance Testing',
         icon: 'bug-play',
-        url: 'ncr/uat'
-      }
-    ]
+        url: 'ncr/uat',
+      },
+    ],
   },
   {
     title: 'Reports',
     icon: 'book-marked',
-    url: '/reports'
-  }
+    url: '/reports',
+  },
 ];

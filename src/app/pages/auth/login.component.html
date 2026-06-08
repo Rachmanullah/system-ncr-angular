@@ -1,48 +1,35 @@
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-    <div
-        class="w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-8">
+<div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-8">
         <div class="flex justify-center mb-4">
-            <div
-                class="w-14 h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl">
+            <div class="w-14 h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl">
                 NCR
             </div>
         </div>
+
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-gray-900">
-                Sign In
-            </h1>
-            <p class="mt-2 text-sm text-gray-500">
-                Enter your credentials to access the system.
-            </p>
+            <h1 class="text-2xl font-bold text-gray-900">Sign In</h1>
+
+            <p class="mt-2 text-sm text-gray-500">Enter your credentials to access the system.</p>
         </div>
-        <form class="space-y-5">
+
+        <form class="space-y-5" (ngSubmit)="onSubmit()">
             <div class="mb-2">
-                <app-input
-                    label="Username"
-                    placeholder="Enter username"
-                    [(ngModel)]="form.username"
-                    name="username"
-                    [required]="true"
-                    [error]="formErrors.username">
-                 </app-input>
-            </div>
-            <div class="mb-2">
-                <app-input
-                    type="password"
-                    label="Password"
-                    placeholder="Enter password"
-                    [(ngModel)]="form.password"
-                    name="password"
-                    [required]="true"
-                    [error]="formErrors.password">
+                <app-input label="Username" placeholder="Enter username" name="username" [required]="true"
+                    [ngModel]="form().username" (ngModelChange)="updateUsername($event)"
+                    [error]="showErrors() ? formErrors().username : ''">
                 </app-input>
             </div>
+
+            <div class="mb-2">
+                <app-input type="password" label="Password" placeholder="Enter password" name="password"
+                    [required]="true" [ngModel]="form().password" (ngModelChange)="updatePassword($event)"
+                    [error]="showErrors() ? formErrors().password : ''">
+                </app-input>
+            </div>
+
             <div class="mt-4">
-                <app-button
-                    [title]="isLoading ? 'Signing In...' : 'Sign In'"
-                    [disabled]="isLoading"
-                    [fullWidth]="true"
-                    (onClick)="onSubmit()">
+                <app-button [title]="isLoading() ? 'Signing In...' : 'Sign In'" [disabled]="isLoading()"
+                    [fullWidth]="true" (onClick)="onSubmit()">
                 </app-button>
             </div>
         </form>
