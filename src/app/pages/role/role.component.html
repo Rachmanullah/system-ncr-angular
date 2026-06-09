@@ -1,0 +1,149 @@
+<div class="p-6 space-y-6">
+    <app-breadcrumb [items]="[{ title: 'Master', icon: 'settings' }, { title: 'Roles', icon: 'shield' }]">
+    </app-breadcrumb>
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+        <div>
+            <h1 class="text-3xl font-bold text-heading">
+                Master Roles
+            </h1>
+
+            <p class="mt-1 text-sm text-body-muted">
+                Manage application permissions
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative">
+                <input type="text" placeholder="Search role..."
+                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
+            </div>
+            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
+            </app-button>
+            <app-button title="Add Role" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
+            </app-button>
+        </div>
+    </div>
+
+    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                    <tr>
+                        <th class="w-10 px-4 py-4">
+                            <input type="checkbox">
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Role Name
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Status
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="isLoading">
+                        <td colspan="3" class="py-16">
+                            <div class="flex justify-center">
+                                <app-circularProgress [isLoading]="true">
+                                </app-circularProgress>
+                            </div>
+                        </td>
+                    </tr>
+                    <ng-container *ngIf="!isLoading && roles.length > 0">
+                        <tr *ngFor="let role of roles"
+                            class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                            <td class="px-4 py-4">
+                                <input type="checkbox">
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading">
+                                    {{ role.roleName }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium" [ngClass]="{
+                                        'bg-green-100 text-green-700': !role.status,
+                                        'bg-red-100 text-red-700': role.status
+                                    }">
+                                    {{ role.status ? 'Inactive' : 'Active' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 justify-items-center">
+                                <div class="flex items-center gap-4">
+                                    <app-button (onClick)="openEditModal(role)" icon="square-pen"
+                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        [variant]="BUTTON_VARIANTS.OUTLINE"
+                                        customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
+                                    </app-button>
+
+                                    <app-button (onClick)="deleteRole(role.roleId)" icon="trash-2"
+                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        [variant]="BUTTON_VARIANTS.OUTLINE"
+                                        customClass="border-red-500 text-red-600 hover:bg-red-50">
+                                    </app-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <tr *ngIf="!isLoading && roles.length === 0">
+                        <td colspan="9">
+                            <div class="py-16 text-center">
+                                <div class="text-lg font-medium text-heading">
+                                    No Role Found
+                                </div>
+                                <div class="mt-2 text-sm text-body-muted">
+                                    There is no role data available.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-default">
+            <span class="text-sm text-body-muted">
+                Total Role: {{ roles.length }}
+            </span>
+            <div class="flex gap-2">
+                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                </app-button>
+
+                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>
+<app-modal *ngIf="showModal" [title]="modalMode === 'add'
+        ? 'Add Role'
+        : 'Edit Role'" size="lg" (close)="closeModal()">
+    <div modal-body>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <app-input label="Full Name" [ngModel]="selectedRole().roleName"
+                    (ngModelChange)="updateField('roleName', $event)"
+                    [error]="showErrors() ? validationErrors().roleName : ''">
+                </app-input>
+            </div>
+            <div>
+                <app-select-input label="Status" placeholder="Select Status" [options]="statusData"
+                    [ngModel]="selectedRole().status" (ngModelChange)="updateField('status', +$event)"
+                    [error]="showErrors() ? validationErrors().status : ''">
+                </app-select-input>
+            </div>
+        </div>
+    </div>
+    <div modal-footer>
+        <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
+        </app-button>
+        <app-button [title]="modalMode === 'add'
+                ? 'Create Role'
+                : 'Update Role'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveRole()"
+            customClass="mt-2">
+        </app-button>
+    </div>
+</app-modal>

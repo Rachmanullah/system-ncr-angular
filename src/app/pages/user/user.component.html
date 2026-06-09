@@ -1,11 +1,6 @@
 <div class="p-6 space-y-6">
-
-    <nav class="flex items-center text-sm text-body-muted">
-        <span>Master</span>
-        <span class="mx-2">/</span>
-        <span class="font-medium text-heading">Users</span>
-    </nav>
-
+    <app-breadcrumb [items]="[{ title: 'Master', icon: 'settings' }, { title: 'Users', icon: 'users' }]">
+    </app-breadcrumb>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
         <div>
@@ -14,7 +9,7 @@
             </h1>
 
             <p class="mt-1 text-sm text-body-muted">
-                Manage application users and permissions
+                Manage application users
             </p>
         </div>
 
@@ -33,43 +28,43 @@
         </div>
     </div>
 
-    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow-sm overflow-hidden">
+    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                     <tr>
-                        <th class="w-10 px-4 py-4">
+                        <th class="w-10 px-4 py-4 text-center">
                             <input type="checkbox">
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Name
                         </th>
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Username
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Email
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Position
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Department
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Role
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Status
                         </th>
 
-                        <th class="px-6 py-4 font-semibold">
+                        <th class="px-6 py-4 font-semibold text-center">
                             Action
                         </th>
                     </tr>
@@ -117,7 +112,7 @@
                                 {{ user.role.roleName }}
                             </td>
 
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-center">
                                 <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium" [ngClass]="{
                                         'bg-green-100 text-green-700': !user.status,
                                         'bg-red-100 text-red-700': user.status
@@ -126,7 +121,7 @@
                                 </span>
                             </td>
 
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
                                     <app-button (onClick)="openEditModal(user)" icon="square-pen"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"

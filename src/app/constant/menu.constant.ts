@@ -23,7 +23,7 @@ export const DUMMY_MENUS: MenuItem[] = [
       {
         title: 'Department Management',
         icon: 'building',
-        url: '/master/department',
+        url: '/master/departments',
       },
       {
         title: 'Menu Management',

@@ -19,6 +19,7 @@ import { ModalComponent } from '../../component/modal/modal.component';
 import Swal from 'sweetalert2';
 import { SelectInputComponent } from '../../component/selectInput/selectInput';
 import { selectInput } from '../../core/class/selectInput.class';
+import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
 
 @Component({
     selector: 'app-user',
@@ -30,7 +31,8 @@ import { selectInput } from '../../core/class/selectInput.class';
         InputComponent,
         CircularProgressComponent,
         ModalComponent,
-        SelectInputComponent
+        SelectInputComponent,
+        BreadCrumbComponent
     ],
     templateUrl: './user.component.html',
 })
@@ -267,24 +269,34 @@ export class UsersComponent implements OnInit {
         this.showErrors.set(true);
         const payload = this.selectedUser();
         console.log("payload : ", payload);
-        console.log('DELETE USER');
-        this.userService.deleteUser(userId).subscribe({
-            next: (res) => {
-                console.log(res);
-                this.isLoading = false;
-                Swal.fire('Success', res.message, 'success');
-            },
-            error: (err) => {
-                console.log(err);
-                this.isLoading = false;
-                Swal.fire(
-                    'Error',
-                    err?.error?.message || 'Unknown Error',
-                    'error'
-                );
-            },
-            complete: () => {
-                this.fetchUsers();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Delete User ${payload.fullname} ?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!'
+        }).then(result => {
+            if (result.isConfirmed) {
+                console.log('DELETE USER');
+                this.userService.deleteUser(userId).subscribe({
+                    next: (res) => {
+                        console.log(res);
+                        this.isLoading = false;
+                        Swal.fire('Success', res.message, 'success');
+                    },
+                    error: (err) => {
+                        console.log(err);
+                        this.isLoading = false;
+                        Swal.fire(
+                            'Error',
+                            err?.error?.message || 'Unknown Error',
+                            'error'
+                        );
+                    },
+                    complete: () => {
+                        this.fetchUsers();
+                    }
+                })
             }
         })
     }

@@ -5,6 +5,8 @@ import { MainLayoutComponent } from './layouts/main/main-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UsersComponent } from './pages/user/user.component';
 import { departmentResolver, roleResolver, userResolver } from './core/resolver/resolver';
+import { RoleComponent } from './pages/role/role.component';
+import { DepartmentComponent } from './pages/department/department.component';
 
 export const routes: Routes = [
     {
@@ -17,11 +19,13 @@ export const routes: Routes = [
         ]
     },
     {
-        path:'',
+        path: '',
         component: MainLayoutComponent,
         children: [
-            { path: 'dashboard', component: DashboardComponent},
-            { path: 'master/users', component: UsersComponent, resolve: {userData: userResolver, roleData: roleResolver, departmentData : departmentResolver}}
+            { path: 'dashboard', component: DashboardComponent },
+            { path: 'master/users', component: UsersComponent, resolve: { userData: userResolver, roleData: roleResolver, departmentData: departmentResolver } },
+            { path: 'master/roles', component: RoleComponent, resolve: { roleData: roleResolver } },
+            { path: 'master/departments', component: DepartmentComponent, resolve: { departmentData: departmentResolver } },
         ]
     }
 ];
