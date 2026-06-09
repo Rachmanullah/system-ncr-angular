@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, forwardRef, Input } from "@angular/core";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { LucideAngularModule } from "lucide-angular";
 
 export interface SelectOption {
@@ -11,7 +11,7 @@ export interface SelectOption {
 @Component({
     selector: 'app-select-input',
     standalone: true,
-    imports: [CommonModule, LucideAngularModule],
+    imports: [CommonModule,FormsModule, LucideAngularModule],
     templateUrl: './selectInput.html',
     providers: [
         {
@@ -27,7 +27,7 @@ export class SelectInputComponent implements ControlValueAccessor {
     @Input() placeholder = 'Select option';
     @Input() options: SelectOption[] = [];
     @Input() disabled = false;
-
+    @Input() error = '';
     value: any = '';
 
     private onChangeFn: (value: any) => void = () => { };
@@ -49,10 +49,15 @@ export class SelectInputComponent implements ControlValueAccessor {
         this.disabled = isDisabled;
     }
 
-    onSelectChange(event: Event) {
-        const value = (event.target as HTMLSelectElement).value;
-        this.value = value;
-        this.onChangeFn(value);
+    onSelectChange(value: string | number) {
+        const parsedValue =
+            value !== '' && !isNaN(Number(value))
+                ? Number(value)
+                : value;
+
+        this.value = parsedValue;
+
+        this.onChangeFn(parsedValue);
         this.onTouchedFn();
     }
 }

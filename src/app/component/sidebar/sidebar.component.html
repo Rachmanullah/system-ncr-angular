@@ -24,7 +24,7 @@
                         [class.max-h-0]="!menu.open" [class.max-h-96]="menu.open" [class.opacity-0]="!menu.open"
                         [class.opacity-100]="menu.open">
                         <li *ngFor="let child of menu.children">
-                            <a [routerLink]="child.url" routerLinkActive="bg-[var(--bg-secondary)] text-[var(--secondary)]"
+                            <a [routerLink]="child.url" routerLinkActive="bg-[var(--bg-secondary)] text-[var(--text-secondary)]"
                                 class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[var(--text-muted)] hover:text-[var(--secondary)] hover:bg-[var(--bg-hover)] transition">
                                 <lucide-icon [name]="child.icon" class="w-4 h-4"></lucide-icon>
                                 {{ child.title }}

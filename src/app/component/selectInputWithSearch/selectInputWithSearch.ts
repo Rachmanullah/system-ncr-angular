@@ -27,6 +27,7 @@ export class SelectInputWithSearchComponent implements ControlValueAccessor {
     @Input() placeholder = 'Select option';
     @Input() options: SelectOption[] = [];
     @Input() disabled = false;
+    @Input() error = '';
 
     value: any = '';
     searchText = '';
@@ -61,16 +62,6 @@ export class SelectInputWithSearchComponent implements ControlValueAccessor {
         this.onTouchedFn();
     }
 
-    // onSearch(event: Event) {
-    //     const keyword = (event.target as HTMLInputElement).value.toLowerCase();
-    //     // this.filteredOptions = this.options.filter(o =>
-    //     //     o.label.toLowerCase().includes(keyword)
-    //     // );
-    //     this.filteredOptions = this.computedOptions.filter(o =>
-    //         o.label.toLowerCase().includes(keyword)
-    //     );
-    // }
-
     onSearch(event: Event) {
         this.searchText = (event.target as HTMLInputElement).value;
 
@@ -89,7 +80,6 @@ export class SelectInputWithSearchComponent implements ControlValueAccessor {
             ];
         }
     }
-
 
     selectOption(option: SelectOption) {
         this.value = option.value;

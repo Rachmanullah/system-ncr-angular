@@ -7,6 +7,8 @@ import { AuthRequest } from '../../core/class/auth.class';
 import { AuthService } from '../../service/auth.service';
 import { ButtonComponent } from '../../component/button/button';
 import { InputComponent } from '../../component/inputCustom/input.component';
+import { BUTTON_RADIUS, BUTTON_SIZES, BUTTON_VARIANTS } from '../../constant/button.constant';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-login',
@@ -20,7 +22,9 @@ import { InputComponent } from '../../component/inputCustom/input.component';
     templateUrl: './login.component.html'
 })
 export class LoginComponent {
-
+    protected readonly BUTTON_VARIANTS = BUTTON_VARIANTS;
+    protected readonly BUTTON_SIZES = BUTTON_SIZES;
+    protected readonly BUTTON_RADIUS = BUTTON_RADIUS;
     readonly form = signal<AuthRequest>({
         username: '',
         password: ''
@@ -82,7 +86,7 @@ export class LoginComponent {
             },
             error: (error) => {
                 this.isLoading.set(false);
-
+                Swal.fire('Error', error.message, 'error');
                 console.error(error);
             }
         });

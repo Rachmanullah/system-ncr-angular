@@ -11,6 +11,7 @@ import { initFlowbite } from 'flowbite';
     standalone: true,
     imports: [RouterOutlet, NavbarComponent, SidebarComponent],
     templateUrl: './main-layout.component.html',
+    styleUrls: ['./main-layout.component.css']
 })
 export class MainLayoutComponent implements OnInit, AfterViewInit {
     isSidebarOpen = true;

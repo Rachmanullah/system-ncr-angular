@@ -13,22 +13,22 @@ export const DUMMY_MENUS: MenuItem[] = [
       {
         title: 'User Management',
         icon: 'users',
-        url: '/system/users',
+        url: '/master/users',
       },
       {
         title: 'Role Management',
         icon: 'shield',
-        url: '/system/roles',
+        url: '/master/roles',
       },
       {
         title: 'Department Management',
         icon: 'building',
-        url: '/system/department',
+        url: '/master/department',
       },
       {
         title: 'Menu Management',
         icon: 'menu',
-        url: '/system/menus',
+        url: '/master/menus',
       },
     ],
   },
