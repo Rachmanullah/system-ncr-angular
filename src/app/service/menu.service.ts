@@ -8,7 +8,7 @@ import { ApiResponse } from "../core/http/apiResponse.class";
 import { ApiMessageResponse } from "../core/http/apiMessageResponse";
 
 @Injectable({ providedIn: 'root' })
-export class MenuService extends BaseApiService{
+export class MenuService extends BaseApiService {
     private endpoint = `${this.apiUrl}/layout/menu`;
 
     private menuSubject = new BehaviorSubject<MenuItem[]>([]);

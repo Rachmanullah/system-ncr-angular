@@ -10,7 +10,7 @@ export interface MenuItem {
 
 export interface MenuBase {
     menuId: number;
-    menuTitle?: string | null;
+    menuTitle: string;
     menuIcon?: string | null;
     menuRoute?: string | null;
     menuParentId?: number | null;
@@ -20,7 +20,7 @@ export interface MenuBase {
 
 
 export interface MenuRequest {
-    menuTitle: string | null;
+    menuTitle: string;
     menuIcon?: string | null;
     menuRoute?: string | null;
     menuParentId?: number | null;
