@@ -30,10 +30,8 @@ export class AuthService extends BaseApiService{
 
         const token = localStorage.getItem('token');
         const tokenExpiredAt = localStorage.getItem('token_expiredAt');
-        const server = localStorage.getItem('targetServer');
 
-        if(!token || !tokenExpiredAt || !server) return false;
-
+        if(!token || !tokenExpiredAt) return false;
         const now = Math.floor(Date.now() / 1000);
 
         if(now > +tokenExpiredAt){

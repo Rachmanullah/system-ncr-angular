@@ -9,6 +9,8 @@ import { DepartmentBase } from "../class/department.class";
 import { DepartmentService } from "../../service/department.service";
 import { MenuBase } from "../class/menu.class";
 import { MenuService } from "../../service/menu.service";
+import { RoleMenuService } from "../../service/rolemenu.service";
+import { RoleMenuBase } from "../class/roleMenu.class";
 
 export const userResolver: ResolveFn<UserBase[]> = (route, state) => {
     const service = inject(UserService);
@@ -37,6 +39,14 @@ export const departmentResolver: ResolveFn<DepartmentBase[]> = (route, state) =>
 export const menuResolver: ResolveFn<MenuBase[]> = (route, state) => {
     const service = inject(MenuService);
     return service.getAllMenu().pipe(
+        map(res => res.data ?? []),
+        catchError(() => of([]))
+    );
+};
+
+export const roleMenuResolver: ResolveFn<RoleMenuBase[]> = (route, state) => {
+    const service = inject(RoleMenuService);
+    return service.getAllRoleMenu().pipe(
         map(res => res.data ?? []),
         catchError(() => of([]))
     );

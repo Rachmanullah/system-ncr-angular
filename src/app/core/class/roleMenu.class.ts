@@ -1,12 +1,15 @@
 export interface RoleMenuBase{
     roleMenuId: number;
-    roleId: string;
-    menuId?: number | null;
-    titleMenu?: string | null;
-    deleted?: number | null;
+    roleId: number;
+    roleName: string;
+    menuId: number;
+    menuTitle: string;
+    status: number
+    deleted: number;
 }
 
 export interface RoleMenuRequest{
-    roleId: string;
-    menuId?: number;
+    roleId: number;
+    menuId: number;
+    status: number;
 }

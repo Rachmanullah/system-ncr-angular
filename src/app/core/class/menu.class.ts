@@ -16,6 +16,7 @@ export interface MenuBase {
     menuParentId?: number | null;
     menuParentTitle?: string | null;
     menuParentIcon?: string | null;
+    deleted: number;
 }
 
 

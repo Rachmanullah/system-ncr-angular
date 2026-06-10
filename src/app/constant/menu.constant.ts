@@ -21,6 +21,11 @@ export const DUMMY_MENUS: MenuItem[] = [
         url: '/master/roles',
       },
       {
+        title: 'Role Authorization',
+        icon: 'shield-user',
+        url: '/master/rolemenu',
+      },
+      {
         title: 'Department Management',
         icon: 'building',
         url: '/master/departments',
