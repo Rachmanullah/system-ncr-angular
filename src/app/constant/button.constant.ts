@@ -36,6 +36,13 @@ export const BUTTON_VARIANTS = {
     focus:ring-red-300
   `,
 
+  WARNING: `
+    bg-yellow-600
+    text-white
+    hover:bg-yellow-700
+    focus:ring-yellow-300
+  `,
+
   SUCCESS: `
     bg-green-600
     text-white

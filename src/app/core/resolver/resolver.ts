@@ -11,6 +11,8 @@ import { MenuBase } from "../class/menu.class";
 import { MenuService } from "../../service/menu.service";
 import { RoleMenuService } from "../../service/rolemenu.service";
 import { RoleMenuBase } from "../class/roleMenu.class";
+import { NCRMatrixBase } from "../class/matrix.class";
+import { NCRMatrixApprovalService } from "../../service/matrixApproval.service";
 
 export const userResolver: ResolveFn<UserBase[]> = (route, state) => {
     const service = inject(UserService);
@@ -51,3 +53,11 @@ export const roleMenuResolver: ResolveFn<RoleMenuBase[]> = (route, state) => {
         catchError(() => of([]))
     );
 };
+
+export const matrixApprovalResolver: ResolveFn<NCRMatrixBase[]> = (route, state) => {
+    const service = inject(NCRMatrixApprovalService);
+    return service.getAllMatrix().pipe(
+        map(res => res.data ?? []),
+        catchError(() => of([]))
+    );
+}

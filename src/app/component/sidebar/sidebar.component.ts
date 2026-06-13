@@ -22,7 +22,7 @@ export class SidebarComponent{
         this.layout.sidebar$.subscribe(v => this.isOpen = v);
     }
      ngOnInit(): void {
-         this.menus$ = of(DUMMY_MENUS);
-        // this.menus$ = this.menuService.menus$;
+        // this.menus$ = of(DUMMY_MENUS);
+        this.menus$ = this.menuService.menus$;
      }
 }

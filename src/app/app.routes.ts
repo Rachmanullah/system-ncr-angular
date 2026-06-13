@@ -4,13 +4,14 @@ import { LoginComponent } from './pages/auth/login.component';
 import { MainLayoutComponent } from './layouts/main/main-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UsersComponent } from './pages/user/user.component';
-import { departmentResolver, menuResolver, roleMenuResolver, roleResolver, userResolver } from './core/resolver/resolver';
+import { departmentResolver, matrixApprovalResolver, menuResolver, roleMenuResolver, roleResolver, userResolver } from './core/resolver/resolver';
 import { RoleComponent } from './pages/role/role.component';
 import { DepartmentComponent } from './pages/department/department.component';
 import { MenuComponent } from './pages/menu/menu.component';
 import { RoleMenuComponent } from './pages/rolemenu/rolemenu.component';
 import { authGuard } from './core/guard/auth.guard';
 import { guestGuard } from './core/guard/guest.guard';
+import { NCRMatrixApprovalComponent } from './pages/ncrMatrixApproval/matrixApproval.component';
 
 export const routes: Routes = [
     {
@@ -29,11 +30,33 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: 'dashboard', component: DashboardComponent },
-            { path: 'master/users', component: UsersComponent, resolve: { userData: userResolver, roleData: roleResolver, departmentData: departmentResolver } },
-            { path: 'master/roles', component: RoleComponent, resolve: { roleData: roleResolver } },
-            { path: 'master/departments', component: DepartmentComponent, resolve: { departmentData: departmentResolver } },
-            { path: 'master/menus', component: MenuComponent, resolve: { menuData: menuResolver } },
-            { path: 'master/rolemenu', component: RoleMenuComponent, resolve: { roleMenuData: roleMenuResolver, roleData: roleResolver, menuData: menuResolver} },
+        ]
+    },
+    {
+        path: 'system',
+        component: MainLayoutComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: 'users', component: UsersComponent, resolve: { userData: userResolver, roleData: roleResolver, departmentData: departmentResolver } },
+            { path: 'roles', component: RoleComponent, resolve: { roleData: roleResolver } },
+            { path: 'menus', component: MenuComponent, resolve: { menuData: menuResolver } },
+            { path: 'rolemenu', component: RoleMenuComponent, resolve: { roleMenuData: roleMenuResolver, roleData: roleResolver, menuData: menuResolver } },
+        ]
+    },
+    {
+        path: 'master',
+        component: MainLayoutComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: 'departments', component: DepartmentComponent, resolve: { departmentData: departmentResolver } },
+        ]
+    },
+    {
+        path: 'ncr',
+        component: MainLayoutComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: 'matrix', component: NCRMatrixApprovalComponent, resolve: { matrixApprovalData: matrixApprovalResolver, userData: userResolver, departmentData: departmentResolver } },
         ]
     }
 ];

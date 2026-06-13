@@ -13,29 +13,35 @@ export const DUMMY_MENUS: MenuItem[] = [
       {
         title: 'User Management',
         icon: 'users',
-        url: '/master/users',
+        url: '/system/users',
       },
       {
         title: 'Role Management',
         icon: 'shield',
-        url: '/master/roles',
+        url: '/system/roles',
       },
       {
         title: 'Role Authorization',
         icon: 'shield-user',
-        url: '/master/rolemenu',
-      },
-      {
-        title: 'Department Management',
-        icon: 'building',
-        url: '/master/departments',
+        url: '/system/rolemenu',
       },
       {
         title: 'Menu Management',
         icon: 'menu',
-        url: '/master/menus',
+        url: '/system/menus',
       },
     ],
+  },
+  {
+    title: 'Master',
+    icon: 'database',
+    children: [
+       {
+        title: 'Department Management',
+        icon: 'building',
+        url: '/master/departments',
+      }
+    ]
   },
   {
     title: 'NCR',

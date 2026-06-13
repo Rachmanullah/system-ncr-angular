@@ -1,8 +1,8 @@
 <app-navbar></app-navbar>
 <app-sidebar></app-sidebar>
 <main class="pt-16 min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-all duration-300"
-[class]="{ 'ml-64': isSidebarOpen, 'ml-0': !isSidebarOpen }">
-<div class="p-5">
+    [class]="{ 'ml-64': isSidebarOpen, 'ml-0': !isSidebarOpen }">
+    <div class="p-5">
         <router-outlet></router-outlet>
     </div>
 </main>

@@ -90,15 +90,18 @@ export class MenuComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        this.loadMenuData();
+    }
+
+    loadMenuData() {
         this.route.data.subscribe((data) => {
-            console.log(data);
             this.menus = data['menuData'];
             this.menuOptions = (data['menuData'] ?? []).map((x: any) => ({
                 label: x.menuTitle,
                 value: x.menuId
-            }))
+            }));
             this.isLoading = false;
-        })
+        });
     }
 
     fetchMenu() {
@@ -206,6 +209,7 @@ export class MenuComponent implements OnInit {
                 },
                 complete: () => {
                     this.fetchMenu();
+                    this.loadMenuData();
                     this.closeModal();
                 }
             })
@@ -242,6 +246,7 @@ export class MenuComponent implements OnInit {
                     },
                     complete: () => {
                         this.fetchMenu();
+                        this.loadMenuData();
                     }
                 })
             }

@@ -1,24 +1,26 @@
 <div class="p-6 space-y-6">
-    <app-breadcrumb [items]="[{ title: 'System', icon: 'settings' }, { title: 'Role Menu', icon: 'shield' }]">
+    <app-breadcrumb
+        [items]="[{ title: 'NCR', icon: 'replace-all' }, { title: 'NCR Matrix Approval', icon: 'badge-check' }]">
     </app-breadcrumb>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-heading">
-                Master Role Menu
+                NCR Matrix Approval
             </h1>
+
             <p class="mt-1 text-sm text-body-muted">
-                Manage Authorization Role
+                Manage ncr matrix approval
             </p>
         </div>
+
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative">
-                <input type="text" placeholder="Search Role Menu..."
+                <input type="text" placeholder="Search Matrix..."
                     class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
             </div>
             <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
             </app-button>
-            <app-button title="Add Role Menu" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
-                (onClick)="openAddModal()">
+            <app-button title="Add Matrix" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
             </app-button>
         </div>
     </div>
@@ -31,10 +33,10 @@
                             <input type="checkbox">
                         </th>
                         <th class="px-6 py-4 font-semibold text-center">
-                            Role Name
+                            Matrix Code
                         </th>
                         <th class="px-6 py-4 font-semibold text-center">
-                            Menu Title
+                            Department
                         </th>
                         <th class="px-6 py-4 font-semibold text-center">
                             Status
@@ -53,20 +55,20 @@
                             </div>
                         </td>
                     </tr>
-                    <ng-container *ngIf="!isLoading && rolemenus.length > 0">
-                        <tr *ngFor="let item of rolemenus"
+                    <ng-container *ngIf="!isLoading && matrixs.length > 0">
+                        <tr *ngFor="let item of matrixs"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
                             <td class="px-4 py-4">
                                 <input type="checkbox">
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading text-center">
-                                    {{ item.roleName }}
+                                    {{ item.ncrMatrixCode }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading text-center">
-                                    {{ item.menuTitle }}
+                                    {{ item.departmentCode}} - {{ item.departmentName }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -85,7 +87,7 @@
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button (onClick)="deleteRoleMenu(item.roleMenuId)" icon="trash-2"
+                                    <app-button (onClick)="deleteMatrix(item.ncrMatrixId)" icon="trash-2"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
@@ -94,14 +96,14 @@
                             </td>
                         </tr>
                     </ng-container>
-                    <tr *ngIf="!isLoading && rolemenus.length === 0">
+                    <tr *ngIf="!isLoading && matrixs.length === 0">
                         <td colspan="5">
                             <div class="py-16 text-center">
                                 <div class="text-lg font-medium text-heading">
-                                    No Role Menu Found
+                                    No Matrix Found
                                 </div>
                                 <div class="mt-2 text-sm text-body-muted">
-                                    There is no role menu data available.
+                                    There is no matrix data available.
                                 </div>
                             </div>
                         </td>
@@ -111,7 +113,7 @@
         </div>
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-default">
             <span class="text-sm text-body-muted">
-                Total Role Menu: {{ rolemenus.length }}
+                Total Matrix Approval: {{ matrixs.length }}
             </span>
             <div class="flex gap-2">
                 <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
@@ -124,37 +126,104 @@
     </div>
 </div>
 <app-modal *ngIf="showModal" [title]="modalMode === 'add'
-        ? 'Add Role Menu'
-        : 'Edit Role Menu'" size="lg" (close)="closeModal()">
+        ? 'Add Matrix Approval'
+        : 'Edit Matrix Approval'" size="lg" (close)="closeModal()" width=800>
     <div modal-body>
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <app-select-input label="Role" placeholder="Select Role" [options]="roles"
-                    [ngModel]="selectedRoleMenu().roleId" (ngModelChange)="updateField('roleId', +$event)"
-                    [error]="showErrors() ? validationErrors().roleId : ''">
-                </app-select-input>
+                <app-input label="Matrix Code" [ngModel]="selectedMatrix().ncrMatrixCode"
+                    (ngModelChange)="updateField('ncrMatrixCode', $event)"
+                    [error]="showErrors() ? validationErrors().ncrMatrixCode : ''"  [readonly]="true">
+                </app-input>
             </div>
             <div>
-                <app-select-input label="Menu" placeholder="Select Menu" [options]="menus"
-                    [ngModel]="selectedRoleMenu().menuId" (ngModelChange)="updateField('menuId', +$event)"
-                    [error]="showErrors() ? validationErrors().menuId : ''">
+                <app-select-input label="Department" placeholder="Select Department" [options]="departmentData"
+                    [ngModel]="selectedMatrix().departmentId"
+                    (ngModelChange)="onDepartmentChange(+$event)"
+                    [error]="showErrors() ? validationErrors().departmentId : ''">
                 </app-select-input>
             </div>
-            <div>
-                <app-select-input label="Status" placeholder="Select Sttus" [options]="statusData"
-                    [ngModel]="selectedRoleMenu().status" (ngModelChange)="updateField('status', +$event)"
-                    [error]="showErrors() ? validationErrors().status : ''">
-                </app-select-input>
-            </div>
+        </div>
+        <div class="flex items-center justify-end gap-5  mt-10">
+            <app-button title="Add Approver" [radius]="BUTTON_RADIUS.FULL"
+                (onClick)="openAddApproverModal()"></app-button>
+        </div>
+        <div class="overflow-x-auto mt-10">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                    <tr>
+                        <th class="w-10 px-4 py-4">
+                            <input type="checkbox">
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Order Number
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Approver Name
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <ng-container *ngIf="!isLoading && selectedMatrix().approver.length > 0">
+                    <tr *ngFor="let item of selectedMatrix().approver; let i = index"
+                        class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                        <td class="px-4 py-4 text-center">
+                            <input type="checkbox">
+                        </td>
+                        <td class="px-4 py-4  text-center">
+                            {{ item.orderNumber }}
+                        </td>
+                        <td class="px-4 py-4  text-center">
+                            {{ getApproverName(item.approverId) }}
+                        </td>
+                        <td class="px-4 py-4 justify-items-center">
+                            <div class="flex items-center gap-4">
+                                <app-button icon="square-pen" (onClick)="openEditApproverModal(i)"
+                                    [variant]="BUTTON_VARIANTS.WARNING">
+                                </app-button>
+                                <app-button icon="trash-2" (onClick)="deleteApprover(i)"
+                                    [variant]="BUTTON_VARIANTS.DANGER">
+                                </app-button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </table>
         </div>
     </div>
     <div modal-footer>
         <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
         <app-button [title]="modalMode === 'add'
-                ? 'Create Role menu'
-                : 'Update Role menu'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveRoleMenu()"
+                ? 'Create'
+                : 'Update'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveMatrix()"
             customClass="mt-2">
+        </app-button>
+    </div>
+</app-modal>
+<app-modal *ngIf="showApproverModal" title="Approver">
+    <div modal-body>
+        <app-select-input label="Approver" [options]="approverData" [ngModel]="selectedApprover().approverId"
+            (ngModelChange)="selectedApprover.update(x => ({
+                ...x,
+                approverId: +$event
+            }))" [error]="showApproverErrors()
+        ? approverValidationErrors().approverId
+        : ''">
+        </app-select-input>
+        <app-input [readonly]="true" type="number" label="Order Number" [ngModel]="selectedApprover().orderNumber"
+            (ngModelChange)="selectedApprover.update(x => ({
+                ...x,
+                orderNumber: +$event
+            }))">
+        </app-input>
+    </div>
+    <div modal-footer>
+        <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModalApprover()"
+            customClass="mr-2"></app-button>
+        <app-button title="Save" (onClick)="saveApprover()">
         </app-button>
     </div>
 </app-modal>
