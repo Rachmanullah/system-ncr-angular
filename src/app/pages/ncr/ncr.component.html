@@ -1,0 +1,283 @@
+<div class="p-6 space-y-6">
+    <app-breadcrumb [items]="[{ title: 'NCR', icon: 'replace-all' }]">
+    </app-breadcrumb>
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-heading">
+                New Change Request
+            </h1>
+            <p class="mt-1 text-sm text-body-muted">
+                Manage New Change Request
+            </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative">
+                <input type="text" placeholder="Search ncr..."
+                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
+            </div>
+            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
+            </app-button>
+            <app-button title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
+                (onClick)="openAddModal()">
+            </app-button>
+        </div>
+    </div>
+    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            NCR Number
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            NCR Title
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            NCR Project
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            NCR Date
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Requestor
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Department
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Status
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="isLoading">
+                        <td colspan="8" class="py-16">
+                            <div class="flex justify-center">
+                                <app-circularProgress [isLoading]="true">
+                                </app-circularProgress>
+                            </div>
+                        </td>
+                    </tr>
+                    <ng-container *ngIf="!isLoading && ncrData.length > 0">
+                        <tr *ngFor="let item of ncrData"
+                            class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.ncrNumber }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.ncrTitle }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.ncrProject }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.ncrDate }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.requestorName }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.departmentName }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-heading text-center">
+                                    {{ item.statusName }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 justify-items-center">
+                                <div class="flex items-center gap-4">
+                                    <app-button (onClick)="openEditModal(item)" icon="square-pen"
+                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        [variant]="BUTTON_VARIANTS.OUTLINE"
+                                        customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
+                                    </app-button>
+
+                                    <app-button (onClick)="deleteNcr(item)" icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        [variant]="BUTTON_VARIANTS.OUTLINE"
+                                        customClass="border-red-500 text-red-600 hover:bg-red-50">
+                                    </app-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <tr *ngIf="!isLoading && ncrData.length === 0">
+                        <td colspan="8">
+                            <div class="py-16 text-center">
+                                <div class="text-lg font-medium text-heading">
+                                    No NCR Found
+                                </div>
+                                <div class="mt-2 text-sm text-body-muted">
+                                    There is no NCR data available.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-default">
+            <span class="text-sm text-body-muted">
+                Total NCR: {{ ncrData.length }}
+            </span>
+            <div class="flex gap-2">
+                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                </app-button>
+
+                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                </app-button>
+            </div>
+        </div>
+    </div>
+</div>
+<app-modal *ngIf="showModal" [title]="modalMode === 'add'
+        ? 'Add NCR'
+        : 'Edit NCR'" size="lg" (close)="closeModal()" width=700>
+    <div modal-body>
+        <div class="grid grid-cols-3 gap-4">
+            <div>
+                <app-input label="NCR Number" [ngModel]="selectedNcr().ncrNumber"
+                    (ngModelChange)="updateField('ncrNumber', $event)"
+                    [error]="showErrors() ? validationErrors().ncrNumber : ''" [readonly]="true">
+                </app-input>
+            </div>
+            <div>
+                <app-input label="Requestor" [ngModel]="selectedNcr().requestorName"
+                    (ngModelChange)="updateField('requestorId', $event)"
+                    [error]="showErrors() ? validationErrors().requestorId : ''" [readonly]="true">
+                </app-input>
+            </div>
+            <div>
+                <app-input label="Department" [ngModel]="selectedNcr().departmentName"
+                    (ngModelChange)="updateField('departmentId', $event)"
+                    [error]="showErrors() ? validationErrors().departmentId : ''" [readonly]="true">
+                </app-input>
+            </div>
+            <div>
+                <app-input label="Title" [ngModel]="selectedNcr().ncrTitle"
+                    (ngModelChange)="updateField('ncrTitle', $event)"
+                    [error]="showErrors() ? validationErrors().ncrTitle : ''">
+                </app-input>
+            </div>
+            <div>
+                <app-input label="Name Project" [ngModel]="selectedNcr().ncrProject"
+                    (ngModelChange)="updateField('ncrProject', $event)"
+                    [error]="showErrors() ? validationErrors().ncrProject : ''">
+                </app-input>
+            </div>
+            <div>
+                <app-select-input label="Category" placeholder="Select Category" [options]="categoryData"
+                    [ngModel]="selectedNcr().ncrCategory" (ngModelChange)="updateField('ncrCategory', $event)"  [error]="showErrors() ? validationErrors().ncrCategory : ''">
+                </app-select-input>
+            </div>
+            <div>
+                <app-input type="date" label="Date" [ngModel]="selectedNcr().ncrDate"
+                    (ngModelChange)="updateField('ncrDate', $event)"
+                    [error]="showErrors() ? validationErrors().ncrDate : ''" [readonly]="true">
+                </app-input>
+            </div>
+            <div>
+                <app-input type="date" label="Target Implementation Date"
+                    [ngModel]="selectedNcr().ncrImplementationDate"
+                    (ngModelChange)="updateField('ncrImplementationDate', $event)"
+                    [error]="showErrors() ? validationErrors().ncrImplementationDate : ''">
+                </app-input>
+            </div>
+            <div>
+                <app-input label="Status" [ngModel]="selectedNcr().statusName"
+                    (ngModelChange)="updateField('statusName', $event)" [readonly]="true">
+                </app-input>
+            </div>
+        </div>
+
+        <app-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="activeTab.set($event)">
+        </app-tabs>
+
+        <div class="mt-4">
+            <ng-container *ngIf="activeTab() === 'detail'">
+                <div class="grid grid-cols-2 gap-4">
+                    <app-select-input label="Priority" [options]="priorityData"
+                        [ngModel]="selectedNcr().detail.priority"  (ngModelChange)="updateDetailField('priority', $event)">
+                    </app-select-input>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-2">
+                    <app-textarea label="Description" [rows]="5" [required]="true"
+                        [ngModel]="selectedNcr().detail.description"
+                        (ngModelChange)="updateDetailField('description', $event)"
+                        [error]="showErrors() ? validationErrors().description : ''">
+                    </app-textarea>
+                    <app-textarea label="As Is" [rows]="5"
+                        [ngModel]="selectedNcr().detail.asIs"
+                        (ngModelChange)="updateDetailField('asIs', $event)"
+                        [error]="showErrors() ? validationErrors().asIs : ''">
+                    </app-textarea>
+                    <app-textarea label="To Be" [rows]="5"
+                        [ngModel]="selectedNcr().detail.toBe"
+                        (ngModelChange)="updateDetailField('toBe', $event)"
+                        [error]="showErrors() ? validationErrors().toBe : ''">
+                    </app-textarea>
+                    <app-textarea label="Benefit" [rows]="5"
+                        [ngModel]="selectedNcr().detail.benefit"
+                        (ngModelChange)="updateDetailField('benefit', $event)"
+                        [error]="showErrors() ? validationErrors().benefit : ''">
+                    </app-textarea>
+                    <app-textarea label="Impact" [rows]="5"
+                        [ngModel]="selectedNcr().detail.impact"
+                        (ngModelChange)="updateDetailField('impact', $event)"
+                        [error]="showErrors() ? validationErrors().impact : ''">
+                    </app-textarea>
+                    <app-textarea label="Financial Impact" [rows]="5"
+                        [ngModel]="selectedNcr().detail.financialImpact"
+                        (ngModelChange)="updateDetailField('financialImpact', $event)"
+                        [error]="showErrors() ? validationErrors().financialImpact : ''">
+                    </app-textarea>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="activeTab() === 'attachment'">
+                <div class="p-4">
+                    Attachment Content
+                </div>
+            </ng-container>
+            <ng-container *ngIf="activeTab() === 'approval'">
+                <div class="p-4">
+                    Approval Content
+                </div>
+            </ng-container>
+            <ng-container *ngIf="activeTab() === 'log'">
+                <div class="p-4">
+                    Log Content
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div modal-footer>
+        <app-button title="Back" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
+        </app-button>
+        <app-button title="Cancel" [variant]="BUTTON_VARIANTS.DANGER" customClass="mr-2">
+        </app-button>
+        <app-button title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS" customClass="mr-2">
+        </app-button>
+        <app-button [title]="modalMode === 'add'
+                ? 'Create'
+                : 'Update'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveNcr(modalMode === 'add'
+                ? 'Create'
+                : 'Update')"
+            customClass="mt-2">
+        </app-button>
+    </div>
+</app-modal>

@@ -4,7 +4,7 @@ import { LoginComponent } from './pages/auth/login.component';
 import { MainLayoutComponent } from './layouts/main/main-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { UsersComponent } from './pages/user/user.component';
-import { departmentResolver, matrixApprovalResolver, menuResolver, roleMenuResolver, roleResolver, userResolver } from './core/resolver/resolver';
+import { departmentResolver, matrixApprovalResolver, menuResolver, ncrResolver, roleMenuResolver, roleResolver, userResolver } from './core/resolver/resolver';
 import { RoleComponent } from './pages/role/role.component';
 import { DepartmentComponent } from './pages/department/department.component';
 import { MenuComponent } from './pages/menu/menu.component';
@@ -12,6 +12,7 @@ import { RoleMenuComponent } from './pages/rolemenu/rolemenu.component';
 import { authGuard } from './core/guard/auth.guard';
 import { guestGuard } from './core/guard/guest.guard';
 import { NCRMatrixApprovalComponent } from './pages/ncrMatrixApproval/matrixApproval.component';
+import { NCRComponent } from './pages/ncr/ncr.component';
 
 export const routes: Routes = [
     {
@@ -56,6 +57,7 @@ export const routes: Routes = [
         component: MainLayoutComponent,
         canActivate: [authGuard],
         children: [
+            { path: 'list', component: NCRComponent, resolve: { ncrData: ncrResolver} },
             { path: 'matrix', component: NCRMatrixApprovalComponent, resolve: { matrixApprovalData: matrixApprovalResolver, userData: userResolver, departmentData: departmentResolver } },
         ]
     }

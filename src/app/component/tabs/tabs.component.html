@@ -1,0 +1,14 @@
+<div class="text-sm font-medium text-center text-body border-b border-default">
+    <ul class="flex flex-wrap -mb-px">
+        <li *ngFor="let tab of tabs" class="me-2">
+            <button type="button" (click)="selectTab(tab.id)"
+                class="inline-block p-4 rounded-t-base border-b-2 transition-all" [ngClass]="{
+                    'text-fg-brand border-brand': activeTab === tab.id,
+                    'border-transparent hover:text-fg-brand hover:border-brand':
+                        activeTab !== tab.id
+                }">
+                {{ tab.title }}
+            </button>
+        </li>
+    </ul>
+</div>

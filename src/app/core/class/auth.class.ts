@@ -1,7 +1,7 @@
 export interface AuthBase {
     userId?: number;
     fullname: string;
-    username: string;
+    username?: string;
     email?: string;
     position?: string;
     departmentId?: number;
