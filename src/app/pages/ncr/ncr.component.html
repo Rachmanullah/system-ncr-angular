@@ -17,8 +17,7 @@
             </div>
             <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
             </app-button>
-            <app-button title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
-                (onClick)="openAddModal()">
+            <app-button title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
             </app-button>
         </div>
     </div>
@@ -108,8 +107,8 @@
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button (onClick)="deleteNcr(item)" icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
-                                        [variant]="BUTTON_VARIANTS.OUTLINE"
+                                    <app-button *ngIf="isAdministrator()" (onClick)="deleteNcr(item)" icon="trash-2" [size]="BUTTON_SIZES.SM"
+                                        [radius]="BUTTON_RADIUS.FULL" [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
                                     </app-button>
                                 </div>
@@ -171,18 +170,19 @@
             <div>
                 <app-input label="Title" [ngModel]="selectedNcr().ncrTitle"
                     (ngModelChange)="updateField('ncrTitle', $event)"
-                    [error]="showErrors() ? validationErrors().ncrTitle : ''">
+                    [error]="showErrors() ? validationErrors().ncrTitle : ''" [readonly]="isCancelled()">
                 </app-input>
             </div>
             <div>
                 <app-input label="Name Project" [ngModel]="selectedNcr().ncrProject"
                     (ngModelChange)="updateField('ncrProject', $event)"
-                    [error]="showErrors() ? validationErrors().ncrProject : ''">
+                    [error]="showErrors() ? validationErrors().ncrProject : ''" [readonly]="isCancelled()">
                 </app-input>
             </div>
             <div>
                 <app-select-input label="Category" placeholder="Select Category" [options]="categoryData"
-                    [ngModel]="selectedNcr().ncrCategory" (ngModelChange)="updateField('ncrCategory', $event)"  [error]="showErrors() ? validationErrors().ncrCategory : ''">
+                    [ngModel]="selectedNcr().ncrCategory" (ngModelChange)="updateField('ncrCategory', $event)"
+                    [error]="showErrors() ? validationErrors().ncrCategory : ''" [disabled]="isCancelled()">
                 </app-select-input>
             </div>
             <div>
@@ -195,7 +195,7 @@
                 <app-input type="date" label="Target Implementation Date"
                     [ngModel]="selectedNcr().ncrImplementationDate"
                     (ngModelChange)="updateField('ncrImplementationDate', $event)"
-                    [error]="showErrors() ? validationErrors().ncrImplementationDate : ''">
+                    [error]="showErrors() ? validationErrors().ncrImplementationDate : ''" [readonly]="isCancelled()">
                 </app-input>
             </div>
             <div>
@@ -212,39 +212,35 @@
             <ng-container *ngIf="activeTab() === 'detail'">
                 <div class="grid grid-cols-2 gap-4">
                     <app-select-input label="Priority" [options]="priorityData"
-                        [ngModel]="selectedNcr().detail.priority"  (ngModelChange)="updateDetailField('priority', $event)">
+                        [ngModel]="selectedNcr().detail.priority"
+                        (ngModelChange)="updateDetailField('priority', $event)" [disabled]="isCancelled()">
                     </app-select-input>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-2">
                     <app-textarea label="Description" [rows]="5" [required]="true"
                         [ngModel]="selectedNcr().detail.description"
                         (ngModelChange)="updateDetailField('description', $event)"
-                        [error]="showErrors() ? validationErrors().description : ''">
+                        [error]="showErrors() ? validationErrors().description : ''" [readonly]="isCancelled()">
                     </app-textarea>
-                    <app-textarea label="As Is" [rows]="5"
-                        [ngModel]="selectedNcr().detail.asIs"
+                    <app-textarea label="As Is" [rows]="5" [ngModel]="selectedNcr().detail.asIs"
                         (ngModelChange)="updateDetailField('asIs', $event)"
-                        [error]="showErrors() ? validationErrors().asIs : ''">
+                        [error]="showErrors() ? validationErrors().asIs : ''" [readonly]="isCancelled()">
                     </app-textarea>
-                    <app-textarea label="To Be" [rows]="5"
-                        [ngModel]="selectedNcr().detail.toBe"
+                    <app-textarea label="To Be" [rows]="5" [ngModel]="selectedNcr().detail.toBe"
                         (ngModelChange)="updateDetailField('toBe', $event)"
-                        [error]="showErrors() ? validationErrors().toBe : ''">
+                        [error]="showErrors() ? validationErrors().toBe : ''" [readonly]="isCancelled()">
                     </app-textarea>
-                    <app-textarea label="Benefit" [rows]="5"
-                        [ngModel]="selectedNcr().detail.benefit"
+                    <app-textarea label="Benefit" [rows]="5" [ngModel]="selectedNcr().detail.benefit"
                         (ngModelChange)="updateDetailField('benefit', $event)"
-                        [error]="showErrors() ? validationErrors().benefit : ''">
+                        [error]="showErrors() ? validationErrors().benefit : ''" [readonly]="isCancelled()">
                     </app-textarea>
-                    <app-textarea label="Impact" [rows]="5"
-                        [ngModel]="selectedNcr().detail.impact"
+                    <app-textarea label="Impact" [rows]="5" [ngModel]="selectedNcr().detail.impact"
                         (ngModelChange)="updateDetailField('impact', $event)"
-                        [error]="showErrors() ? validationErrors().impact : ''">
+                        [error]="showErrors() ? validationErrors().impact : ''" [readonly]="isCancelled()">
                     </app-textarea>
-                    <app-textarea label="Financial Impact" [rows]="5"
-                        [ngModel]="selectedNcr().detail.financialImpact"
+                    <app-textarea label="Financial Impact" [rows]="5" [ngModel]="selectedNcr().detail.financialImpact"
                         (ngModelChange)="updateDetailField('financialImpact', $event)"
-                        [error]="showErrors() ? validationErrors().financialImpact : ''">
+                        [error]="showErrors() ? validationErrors().financialImpact : ''" [readonly]="isCancelled()">
                     </app-textarea>
                 </div>
             </ng-container>
@@ -255,7 +251,67 @@
             </ng-container>
             <ng-container *ngIf="activeTab() === 'approval'">
                 <div class="p-4">
-                    Approval Content
+                    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Order Number
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Approval Name
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Position
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngIf="isLoading">
+                                        <td colspan="3" class="py-16">
+                                            <div class="flex justify-center">
+                                                <app-circularProgress [isLoading]="true">
+                                                </app-circularProgress>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <ng-container *ngIf="!isLoading && selectMatrixData.approver.length > 0">
+                                        <tr *ngFor="let item of selectMatrixData.approver"
+                                            class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.orderNumber }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.approverName }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.approverPosition }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <tr *ngIf="!isLoading && selectMatrixData.approver.length === 0">
+                                        <td colspan="8">
+                                            <div class="py-16 text-center">
+                                                <div class="text-lg font-medium text-heading">
+                                                    No Matrix Approval Found
+                                                </div>
+                                                <div class="mt-2 text-sm text-body-muted">
+                                                    There is no Matrix Approval data available.
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </ng-container>
             <ng-container *ngIf="activeTab() === 'log'">
@@ -268,16 +324,15 @@
     <div modal-footer>
         <app-button title="Back" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button title="Cancel" [variant]="BUTTON_VARIANTS.DANGER" customClass="mr-2">
+        <app-button *ngIf="modalMode === 'edit' && !isCancelled()" title="Cancel" [variant]="BUTTON_VARIANTS.DANGER" customClass="mr-2" (onClick)="saveNcr('Cancel')">
         </app-button>
-        <app-button title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS" customClass="mr-2">
+        <app-button *ngIf="!isCancelled()" title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS" customClass="mr-2" (onClick)="saveNcr('Submit')">
         </app-button>
-        <app-button [title]="modalMode === 'add'
+        <app-button *ngIf="!isCancelled()" [title]="modalMode === 'add'
                 ? 'Create'
                 : 'Update'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveNcr(modalMode === 'add'
                 ? 'Create'
-                : 'Update')"
-            customClass="mt-2">
+                : 'Update')" customClass="mt-2">
         </app-button>
     </div>
 </app-modal>

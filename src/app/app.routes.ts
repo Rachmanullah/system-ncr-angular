@@ -57,7 +57,7 @@ export const routes: Routes = [
         component: MainLayoutComponent,
         canActivate: [authGuard],
         children: [
-            { path: 'list', component: NCRComponent, resolve: { ncrData: ncrResolver} },
+            { path: 'list', component: NCRComponent, resolve: { ncrData: ncrResolver, matrixApprovalData: matrixApprovalResolver } },
             { path: 'matrix', component: NCRMatrixApprovalComponent, resolve: { matrixApprovalData: matrixApprovalResolver, userData: userResolver, departmentData: departmentResolver } },
         ]
     }

@@ -21,6 +21,7 @@ import { STATUS_DRAFT } from '../../constant/status.constant';
 import { TabItem, TabsComponent } from '../../component/tabs/tabs.component';
 import { TextareaComponent } from '../../component/textArea/textarea.component';
 import Swal from 'sweetalert2';
+import { NCRMatrixBase } from '../../core/class/matrix.class';
 
 @Component({
     selector: 'app-ncr',
@@ -51,10 +52,10 @@ export class NCRComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.loadData();
         this.authService.user$.subscribe(user => {
             this.user = user;
         });
+        this.loadData();
     }
 
     private route = inject(ActivatedRoute);
@@ -63,9 +64,20 @@ export class NCRComponent implements OnInit {
         fullname: '',
         position: '',
         departmentId: 0,
-        departmentName: ''
+        departmentName: '',
+        roleName: ''
     };
     ncrData: NCRBase[] = [];
+    ncrMatrixData: NCRMatrixBase[] = [];
+    selectMatrixData: NCRMatrixBase = {
+        ncrMatrixId: 0,
+        ncrMatrixCode: '',
+        departmentId: 0,
+        departmentCode: '',
+        departmentName: '',
+        status: 0,
+        approver: []
+    };
     categoryData: selectInput[] = CATEGORYCONSTANT.map((res: any) => ({
         label: res.categoryName,
         value: res.categoryValue,
@@ -183,14 +195,25 @@ export class NCRComponent implements OnInit {
         }));
     }
 
-
+    isAdministrator(): boolean {
+        return this.user?.roleName === 'Administrator';
+    }
+    isCancelled = computed(() =>
+        this.selectedNcr().statusCode === 'NCR_CCL' || this.selectedNcr().requestorId != this.user.userId
+    );
     loadData() {
         this.route.data.subscribe((data) => {
-            console.log(data);
-            this.ncrData = (data['ncrData'] ?? []).map((res: any) => ({
+            this.ncrData = (data['ncrData'] ?? []).filter((ncr: NCRBase) => {
+                if (this.isAdministrator()) {
+                    return true;
+                }
+
+                return ncr.requestorId === this.user.userId;
+            }).map((res: any) => ({
                 ...res,
                 ncrDate: formatDate(res.ncrDate),
             }));
+            this.ncrMatrixData = data['matrixApprovalData'];
             this.isLoading = false;
         });
     }
@@ -198,8 +221,12 @@ export class NCRComponent implements OnInit {
     fetchNcr() {
         this.ncrService.getAllNcr().subscribe({
             next: (res) => {
-                console.log(res);
-                this.ncrData = res.data ?? [];
+                this.ncrData = (res.data ?? []).filter((ncr: NCRBase) => {
+                    if (this.isAdministrator()) {
+                        return true;
+                    }
+                    return ncr.requestorId === this.user.userId;
+                });
                 this.isLoading = false;
             },
             error: (err) => {
@@ -208,6 +235,25 @@ export class NCRComponent implements OnInit {
             },
             complete: () => { this.cdr.detectChanges(); }
         });
+    }
+
+    findMatrixNcr(departmentId: number){
+        console.log("departmentId : ",departmentId);
+        const result = this.ncrMatrixData.find(res => res.departmentId == departmentId);
+        if (result) {
+            console.log("matrix :", true);
+            this.selectMatrixData = {
+                ncrMatrixId: result.ncrMatrixId,
+                ncrMatrixCode: result.ncrMatrixCode,
+                departmentId : result.departmentId,
+                departmentCode: result.departmentCode,
+                departmentName: result.departmentName,
+                status: result.status,
+                approver: result.approver
+            }
+        }else{
+            console.log("matrix :", false);
+        }
     }
 
     openAddModal() {
@@ -232,15 +278,14 @@ export class NCRComponent implements OnInit {
             statusName: STATUS_DRAFT.statusName,
             detail: {} as NCRDetailRequest
         });
+        this.findMatrixNcr(Number(this.user.departmentId));
         this.showModal = true;
     }
 
     openEditModal(item: NCRBase) {
         this.showErrors.set(false);
-        console.log("item : ", JSON.stringify(item))
         const ncrDate = formatDate2(item.ncrDate) ?? '';
         const ncrImplementationDate = formatDate2(item.ncrImplementationDate) ?? '';
-        console.log("implementationDate", ncrImplementationDate);
         this.backendErrors.set({});
         this.modalMode = 'edit';
         this.selectedNcrId = item.ncrId;
@@ -269,6 +314,7 @@ export class NCRComponent implements OnInit {
                 financialImpact: item.ncrDetail.financialImpact
             }
         });
+        this.findMatrixNcr(item.departmentId);
         this.showModal = true;
     }
 
@@ -289,6 +335,11 @@ export class NCRComponent implements OnInit {
 
         if (!this.isFormValid()) {
             this.isLoading = false;
+            return;
+        }
+        if(this.selectMatrixData.ncrMatrixId == 0 && action == 'Submit'){
+            this.isLoading = false;
+            Swal.fire('Warning', 'Matrix Approval Not Found For Department', 'warning');
             return;
         }
         if (this.modalMode === 'add') {
