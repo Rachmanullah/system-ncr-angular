@@ -8,7 +8,7 @@ import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
 import { CircularProgressComponent } from '../../component/circularProgress/ciruclarProgress.component';
 import { BUTTON_RADIUS, BUTTON_SIZES, BUTTON_VARIANTS } from '../../constant/button.constant';
 import { ActivatedRoute } from '@angular/router';
-import { NCRBase, NCRDetailRequest, NCRRequest } from '../../core/class/ncr.class';
+import { NCRBase, NCRDetailRequest, NCRLogsBase, NCRRequest } from '../../core/class/ncr.class';
 import { NCRService } from '../../service/ncr.service';
 import { formatDate, formatDate2 } from '../../helper/dateFormat';
 import { selectInput } from '../../core/class/selectInput.class';
@@ -104,6 +104,7 @@ export class NCRComponent implements OnInit {
         statusName: '',
         detail: {} as NCRDetailRequest,
     });
+    selectedNcrLogs : NCRLogsBase[] = [];
     showModal = false;
     isLoading = true;
     submitting = false;
@@ -259,6 +260,7 @@ export class NCRComponent implements OnInit {
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});
+        this.selectedNcrLogs = [];
         this.modalMode = 'add';
         const ncrDate = formatDate2(new Date()) ?? '';
         this.selectedNcr.set({
@@ -314,6 +316,10 @@ export class NCRComponent implements OnInit {
                 financialImpact: item.ncrDetail.financialImpact
             }
         });
+        this.selectedNcrLogs = (item.ncrLogs ?? [] ).map((res) => ({
+            ...res,
+            date: formatDate(res.date) ?? ''
+        }));    
         this.findMatrixNcr(item.departmentId);
         this.showModal = true;
     }

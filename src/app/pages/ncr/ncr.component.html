@@ -316,7 +316,91 @@
             </ng-container>
             <ng-container *ngIf="activeTab() === 'log'">
                 <div class="p-4">
-                    Log Content
+                    <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                                    <tr>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Order Number
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Date
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Name
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Position
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Status
+                                        </th>
+                                        <th class="px-6 py-4 font-semibold text-center">
+                                            Notes
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngIf="isLoading">
+                                        <td colspan="6" class="py-16">
+                                            <div class="flex justify-center">
+                                                <app-circularProgress [isLoading]="true">
+                                                </app-circularProgress>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <ng-container *ngIf="!isLoading && selectedNcrLogs.length > 0">
+                                        <tr *ngFor="let item of selectedNcrLogs"
+                                            class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.orderNumber }}
+                                                </div>
+                                            </td>
+                                             <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.date }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.username }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.userPosition }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.statusName }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="font-medium text-heading text-center">
+                                                    {{ item.notes }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <tr *ngIf="!isLoading && selectedNcrLogs.length === 0">
+                                        <td colspan="8">
+                                            <div class="py-16 text-center">
+                                                <div class="text-lg font-medium text-heading">
+                                                    No Logs Found
+                                                </div>
+                                                <div class="mt-2 text-sm text-body-muted">
+                                                    There is no Logs data available.
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </ng-container>
         </div>

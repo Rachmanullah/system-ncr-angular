@@ -16,6 +16,7 @@ export interface NCRBase {
     statusName              : string;
     runningNumber           : number;
     ncrDetail               : NCRDetailBase;
+    ncrLogs                 : NCRLogsBase[];
 }
 
 export interface NCRDetailBase {
@@ -56,4 +57,14 @@ export interface NCRDetailRequest {
     benefit                 : string;
     impact                  : string;
     financialImpact         : string;    
+}
+
+export interface NCRLogsBase {
+    ncrLogsId?               : number;
+    orderNumber?             : number;
+    statusName?              : string;
+    notes?                   : string;
+    date?                    : string;
+    username?                : string;
+    userPosition?            : string;
 }
