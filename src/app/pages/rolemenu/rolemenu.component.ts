@@ -15,6 +15,9 @@ import { RoleService } from "../../service/role.service";
 import { RoleMenuService } from "../../service/rolemenu.service";
 import { MenuService } from "../../service/menu.service";
 import Swal from "sweetalert2";
+import { SearchInputComponent } from "../../component/searchInput/searchInput";
+import { HasPermissionDirective } from "../../helper/permissionDirective";
+import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class";
 
 @Component({
     selector: 'app-role',
@@ -27,7 +30,9 @@ import Swal from "sweetalert2";
         CircularProgressComponent,
         ModalComponent,
         SelectInputComponent,
-        BreadCrumbComponent
+        BreadCrumbComponent,
+        SearchInputComponent,
+        HasPermissionDirective,
     ],
     templateUrl: './rolemenu.component.html',
 })
@@ -39,6 +44,7 @@ export class RoleMenuComponent implements OnInit {
     private route = inject(ActivatedRoute);
 
     rolemenus: RoleMenuBase[] = [];
+    filteredData: RoleMenuBase[]=[];
     roles: selectInput[] = [];
     menus: selectInput[] = [];
     selectedRoleMenuId: number = 0;
@@ -61,6 +67,9 @@ export class RoleMenuComponent implements OnInit {
     isLoading = true;
     submitting = false;
     modalMode: 'add' | 'edit' = 'add';
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
     showErrors = signal(false);
     backendErrors = signal<Partial<Record<keyof RoleMenuRequest, string>>>({});
 
@@ -115,6 +124,7 @@ export class RoleMenuComponent implements OnInit {
                 value: x.menuId
             }));
             this.isLoading = false;
+            this.applyFilter('');
         })
     }
 
@@ -123,6 +133,7 @@ export class RoleMenuComponent implements OnInit {
             next: (res) => {
                 this.rolemenus = res.data ?? [];
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: (err) => {
                 console.log(err);
@@ -131,6 +142,33 @@ export class RoleMenuComponent implements OnInit {
             complete: () => { this.cdr.detectChanges(); }
         });
     }
+
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+            let searchText = '';
+    
+            if (typeof filter === 'string') {
+                searchText = filter;
+            } else {
+                searchText = filter?.text ?? '';
+            }
+            const text = searchText.toLowerCase();
+            this.filteredData = this.rolemenus.filter(a =>
+                (a.menuTitle ?? '').toLowerCase().includes(text) ||
+                (a.roleName ?? '').toLowerCase().includes(text)
+            );
+            this.currentPage = 1;
+            this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+        }
+    
+        get paginatedData() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.filteredData.slice(start, start + this.itemsPerPage);
+        }
+    
+        changePage(page: number) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+        }
 
     openAddModal() {
         this.showErrors.set(false);

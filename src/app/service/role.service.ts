@@ -9,7 +9,7 @@ import { ApiMessageResponse } from '../core/http/apiMessageResponse';
 @Injectable({ providedIn: 'root' })
 export class RoleService extends BaseApiService {
 
-    private endpoint = `${this.apiUrl}/master/roles`;
+    private endpoint = `${this.apiUrl}/system/roles`;
 
     constructor(http: HttpClient) {
         super(http);

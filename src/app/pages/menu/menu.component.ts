@@ -13,6 +13,9 @@ import { MenuService } from "../../service/menu.service";
 import Swal from "sweetalert2";
 import { SelectInputComponent } from "../../component/selectInput/selectInput";
 import { selectInput } from "../../core/class/selectInput.class";
+import { SearchInputComponent } from "../../component/searchInput/searchInput";
+import { HasPermissionDirective } from "../../helper/permissionDirective";
+import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class";
 
 @Component({
     selector: 'app-menu',
@@ -25,7 +28,9 @@ import { selectInput } from "../../core/class/selectInput.class";
         CircularProgressComponent,
         ModalComponent,
         BreadCrumbComponent,
-        SelectInputComponent
+        SelectInputComponent,
+        SearchInputComponent,
+        HasPermissionDirective
     ],
     templateUrl: './menu.component.html'
 })
@@ -36,6 +41,7 @@ export class MenuComponent implements OnInit {
     private route = inject(ActivatedRoute);
 
     menus: MenuBase[] = [];
+    filteredData: MenuBase[] = [];
     menuOptions: selectInput[] = [];
     selectedMenuId: number = 0;
     selectedMenu = signal<MenuRequest>({
@@ -45,6 +51,9 @@ export class MenuComponent implements OnInit {
         menuParentId: 0
     });
 
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
     showModal = false;
     isLoading = true;
     submitting = false;
@@ -101,6 +110,7 @@ export class MenuComponent implements OnInit {
                 value: x.menuId
             }));
             this.isLoading = false;
+            this.applyFilter('');
         });
     }
 
@@ -109,6 +119,7 @@ export class MenuComponent implements OnInit {
             next: (res) => {
                 this.menus = res.data ?? [];
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: (err) => {
                 console.log(err);
@@ -118,6 +129,33 @@ export class MenuComponent implements OnInit {
         });
     }
 
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+        let searchText = '';
+
+        if (typeof filter === 'string') {
+            searchText = filter;
+        } else {
+            searchText = filter?.text ?? '';
+        }
+        const text = searchText.toLowerCase();
+        this.filteredData = this.menus.filter(a =>
+            (a.menuParentTitle ?? '').toLowerCase().includes(text) ||
+            (a.menuRoute ?? '').toLowerCase().includes(text) ||
+            (a.menuTitle ?? '').toLowerCase().includes(text)
+        );
+        this.currentPage = 1;
+        this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+
+    get paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filteredData.slice(start, start + this.itemsPerPage);
+    }
+
+    changePage(page: number) {
+        if (page < 1 || page > this.totalPages) return;
+        this.currentPage = page;
+    }
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});

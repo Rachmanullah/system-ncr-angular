@@ -3,12 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button';
 import { ButtonTransparantComponent } from '../buttonTransparant/button-transparant';
-
-export interface SearchFilterPayload {
-  text: string;
-  fromDate?: Date;
-  toDate?: Date;
-}
+import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class';
 
 @Component({
   selector: 'app-search-input',

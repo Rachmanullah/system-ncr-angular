@@ -1,20 +1,21 @@
 <div class="p-6 space-y-6">
-    <app-breadcrumb [items]="[{ title: 'NCR', icon: 'replace-all' }]">
+    <app-breadcrumb [items]="[{ title: 'Inbox', icon: 'inbox' }]">
     </app-breadcrumb>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-heading">
-                New Change Request
+                Inbox
             </h1>
             <p class="mt-1 text-sm text-body-muted">
-                Manage New Change Request
+                Manage Document NCR Need Approval
             </p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
-            <div>
-                <app-search-input (search)="applyFilter($event)"></app-search-input>
+            <div class="relative">
+                <input type="text" placeholder="Search ncr..."
+                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
             </div>
-            <app-button *appHasPermission="'CREATE_NCR'" title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
+            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
             </app-button>
         </div>
     </div>
@@ -58,8 +59,8 @@
                             </div>
                         </td>
                     </tr>
-                    <ng-container *ngIf="!isLoading && filteredData.length > 0">
-                        <tr *ngFor="let item of paginatedData"
+                    <ng-container *ngIf="!isLoading && inboxData.length > 0">
+                        <tr *ngFor="let item of inboxData"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading text-center">
@@ -98,21 +99,15 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button *appHasPermission="'UPDATE_NCR'" (onClick)="openEditModal(item)" icon="square-pen"
-                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
-                                        [variant]="BUTTON_VARIANTS.OUTLINE"
-                                        customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
-                                    </app-button>
-
-                                    <app-button *appHasPermission="'DELETE_NCR'" (onClick)="deleteNcr(item)" icon="trash-2" [size]="BUTTON_SIZES.SM"
+                                    <app-button (onClick)="openDetailModal(item)" icon="info" [size]="BUTTON_SIZES.SM"
                                         [radius]="BUTTON_RADIUS.FULL" [variant]="BUTTON_VARIANTS.OUTLINE"
-                                        customClass="border-red-500 text-red-600 hover:bg-red-50">
+                                        customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
                                 </div>
                             </td>
                         </tr>
                     </ng-container>
-                    <tr *ngIf="!isLoading && filteredData.length === 0">
+                    <tr *ngIf="!isLoading && inboxData.length === 0">
                         <td colspan="8">
                             <div class="py-16 text-center">
                                 <div class="text-lg font-medium text-heading">
@@ -129,77 +124,81 @@
         </div>
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-default">
             <span class="text-sm text-body-muted">
-                Total NCR: {{ ncrData.length }}
+                Total NCR: {{ inboxData.length }}
             </span>
             <div class="flex gap-2">
-                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1" title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
 
-                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages" title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
             </div>
         </div>
     </div>
 </div>
-<app-modal *ngIf="showModal" [title]="modalMode() === 'add'
-        ? 'Add NCR'
-        : 'Edit NCR'" size="lg" (close)="closeModal()" width=700>
+<app-modal *ngIf="showModal" [title]="'Detail'" size="lg" (close)="closeModal()" width=700>
     <div modal-body>
         <div class="grid grid-cols-3 gap-4">
             <div>
-                <app-input label="NCR Number" [ngModel]="selectedNcr().ncrNumber"
+                <app-input label="NCR Number" [ngModel]="selectedInbox().ncrNumber"
                     (ngModelChange)="updateField('ncrNumber', $event)"
                     [error]="showErrors() ? validationErrors().ncrNumber : ''" [readonly]="true">
                 </app-input>
             </div>
             <div>
-                <app-input label="Requestor" [ngModel]="selectedNcr().requestorName"
+                <app-input label="Requestor" [ngModel]="selectedInbox().requestorName"
                     (ngModelChange)="updateField('requestorId', $event)"
                     [error]="showErrors() ? validationErrors().requestorId : ''" [readonly]="true">
                 </app-input>
             </div>
             <div>
-                <app-input label="Department" [ngModel]="selectedNcr().departmentName"
+                <app-input label="Department" [ngModel]="selectedInbox().departmentName"
                     (ngModelChange)="updateField('departmentId', $event)"
                     [error]="showErrors() ? validationErrors().departmentId : ''" [readonly]="true">
                 </app-input>
             </div>
             <div>
-                <app-input label="Title" [ngModel]="selectedNcr().ncrTitle"
+                <app-input label="Title" [ngModel]="selectedInbox().ncrTitle"
                     (ngModelChange)="updateField('ncrTitle', $event)"
                     [error]="showErrors() ? validationErrors().ncrTitle : ''" [readonly]="isReadonly()">
                 </app-input>
             </div>
             <div>
-                <app-input label="Name Project" [ngModel]="selectedNcr().ncrProject"
+                <app-input label="Name Project" [ngModel]="selectedInbox().ncrProject"
                     (ngModelChange)="updateField('ncrProject', $event)"
                     [error]="showErrors() ? validationErrors().ncrProject : ''" [readonly]="isReadonly()">
                 </app-input>
             </div>
             <div>
                 <app-select-input label="Category" placeholder="Select Category" [options]="categoryData"
-                    [ngModel]="selectedNcr().ncrCategory" (ngModelChange)="updateField('ncrCategory', $event)"
+                    [ngModel]="selectedInbox().ncrCategory" (ngModelChange)="updateField('ncrCategory', $event)"
                     [error]="showErrors() ? validationErrors().ncrCategory : ''" [disabled]="isReadonly()">
                 </app-select-input>
             </div>
             <div>
-                <app-input type="date" label="Date" [ngModel]="selectedNcr().ncrDate"
+                <app-input type="date" label="Date" [ngModel]="selectedInbox().ncrDate"
                     (ngModelChange)="updateField('ncrDate', $event)"
                     [error]="showErrors() ? validationErrors().ncrDate : ''" [readonly]="true">
                 </app-input>
             </div>
             <div>
                 <app-input type="date" label="Target Implementation Date"
-                    [ngModel]="selectedNcr().ncrImplementationDate"
+                    [ngModel]="selectedInbox().ncrImplementationDate"
                     (ngModelChange)="updateField('ncrImplementationDate', $event)"
                     [error]="showErrors() ? validationErrors().ncrImplementationDate : ''" [readonly]="isReadonly()">
                 </app-input>
             </div>
             <div>
-                <app-input label="Status" [ngModel]="selectedNcr().statusName"
+                <app-input label="Status" [ngModel]="selectedInbox().statusName"
                     (ngModelChange)="updateField('statusName', $event)" [readonly]="true">
                 </app-input>
             </div>
+        </div>
+        <div>
+            <app-textarea label="Note" [rows]="5" [required]="true" [ngModel]="selectedInbox().approverNotes"
+                (ngModelChange)="updateField('approverNotes', $event)"
+                [error]="showErrors() ? validationErrors().approverNotes : ''">
+            </app-textarea>
         </div>
 
         <app-tabs [tabs]="tabs" [activeTab]="activeTab()" (tabChange)="activeTab.set($event)">
@@ -209,33 +208,33 @@
             <ng-container *ngIf="activeTab() === 'detail'">
                 <div class="grid grid-cols-2 gap-4">
                     <app-select-input label="Priority" [options]="priorityData"
-                        [ngModel]="selectedNcr().detail.priority"
+                        [ngModel]="selectedInbox().detail.priority"
                         (ngModelChange)="updateDetailField('priority', $event)" [disabled]="isReadonly()">
                     </app-select-input>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-2">
                     <app-textarea label="Description" [rows]="5" [required]="true"
-                        [ngModel]="selectedNcr().detail.description"
+                        [ngModel]="selectedInbox().detail.description"
                         (ngModelChange)="updateDetailField('description', $event)"
                         [error]="showErrors() ? validationErrors().description : ''" [readonly]="isReadonly()">
                     </app-textarea>
-                    <app-textarea label="As Is" [rows]="5" [ngModel]="selectedNcr().detail.asIs"
+                    <app-textarea label="As Is" [rows]="5" [ngModel]="selectedInbox().detail.asIs"
                         (ngModelChange)="updateDetailField('asIs', $event)"
                         [error]="showErrors() ? validationErrors().asIs : ''" [readonly]="isReadonly()">
                     </app-textarea>
-                    <app-textarea label="To Be" [rows]="5" [ngModel]="selectedNcr().detail.toBe"
+                    <app-textarea label="To Be" [rows]="5" [ngModel]="selectedInbox().detail.toBe"
                         (ngModelChange)="updateDetailField('toBe', $event)"
                         [error]="showErrors() ? validationErrors().toBe : ''" [readonly]="isReadonly()">
                     </app-textarea>
-                    <app-textarea label="Benefit" [rows]="5" [ngModel]="selectedNcr().detail.benefit"
+                    <app-textarea label="Benefit" [rows]="5" [ngModel]="selectedInbox().detail.benefit"
                         (ngModelChange)="updateDetailField('benefit', $event)"
                         [error]="showErrors() ? validationErrors().benefit : ''" [readonly]="isReadonly()">
                     </app-textarea>
-                    <app-textarea label="Impact" [rows]="5" [ngModel]="selectedNcr().detail.impact"
+                    <app-textarea label="Impact" [rows]="5" [ngModel]="selectedInbox().detail.impact"
                         (ngModelChange)="updateDetailField('impact', $event)"
                         [error]="showErrors() ? validationErrors().impact : ''" [readonly]="isReadonly()">
                     </app-textarea>
-                    <app-textarea label="Financial Impact" [rows]="5" [ngModel]="selectedNcr().detail.financialImpact"
+                    <app-textarea label="Financial Impact" [rows]="5" [ngModel]="selectedInbox().detail.financialImpact"
                         (ngModelChange)="updateDetailField('financialImpact', $event)"
                         [error]="showErrors() ? validationErrors().financialImpact : ''" [readonly]="isReadonly()">
                     </app-textarea>
@@ -347,15 +346,15 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <ng-container *ngIf="!isLoading && selectedNcrLogs.length > 0">
-                                        <tr *ngFor="let item of selectedNcrLogs"
+                                    <ng-container *ngIf="!isLoading && selectedInboxLogs.length > 0">
+                                        <tr *ngFor="let item of selectedInboxLogs"
                                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
                                             <td class="px-6 py-4">
                                                 <div class="font-medium text-heading text-center">
                                                     {{ item.orderNumber }}
                                                 </div>
                                             </td>
-                                             <td class="px-6 py-4">
+                                            <td class="px-6 py-4">
                                                 <div class="font-medium text-heading text-center">
                                                     {{ item.date }}
                                                 </div>
@@ -382,7 +381,7 @@
                                             </td>
                                         </tr>
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && selectedNcrLogs.length === 0">
+                                    <tr *ngIf="!isLoading && selectedInboxLogs.length === 0">
                                         <td colspan="8">
                                             <div class="py-16 text-center">
                                                 <div class="text-lg font-medium text-heading">
@@ -405,15 +404,14 @@
     <div modal-footer>
         <app-button title="Back" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button *ngIf="modalMode() === 'edit' && !isReadonly()" title="Cancel" [variant]="BUTTON_VARIANTS.DANGER" customClass="mr-2" (onClick)="saveNcr('Cancel')">
+        <app-button *ngIf="canAssign()" title="Assign" icon="badge-x" [variant]="BUTTON_VARIANTS.WARNING"
+            customClass="mr-2" (onClick)="processNcr('Reject')">
         </app-button>
-        <app-button *ngIf="!isReadonly() && canSubmit()" title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS" customClass="mr-2" (onClick)="saveNcr('Submit')">
+        <app-button *ngIf="canReject()" title="Reject" icon="badge-x" [variant]="BUTTON_VARIANTS.DANGER"
+            customClass="mr-2" (onClick)="processNcr('Reject')">
         </app-button>
-        <app-button *ngIf="!isReadonly()" [title]="modalMode() === 'add'
-                ? 'Create'
-                : 'Update'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveNcr(modalMode() === 'add'
-                ? 'Create'
-                : 'Update')" customClass="mt-2">
+        <app-button *ngIf="canApprove()" title="Approve" icon="badge-check" [variant]="BUTTON_VARIANTS.SUCCESS"
+            customClass="mr-2" (onClick)="processNcr('Approve')">
         </app-button>
     </div>
 </app-modal>

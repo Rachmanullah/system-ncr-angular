@@ -1,28 +1,22 @@
 <div class="p-6 space-y-6">
     <app-breadcrumb [items]="[{ title: 'Master', icon: 'database' }, { title: 'Department', icon: 'building' }]">
     </app-breadcrumb>
+    <div>
+        <h1 class="text-3xl font-bold text-heading">
+            Master Department
+        </h1>
+
+        <p class="mt-1 text-sm text-body-muted">
+            Manage department
+        </p>
+    </div>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
         <div>
-            <h1 class="text-3xl font-bold text-heading">
-                Master Department
-            </h1>
-
-            <p class="mt-1 text-sm text-body-muted">
-                Manage department
-            </p>
+            <app-search-input (search)="applyFilter($event)"></app-search-input>
         </div>
-
-        <div class="flex flex-col sm:flex-row gap-3">
-            <div class="relative">
-                <input type="text" placeholder="Search department..."
-                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
-            </div>
-            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
-            </app-button>
-            <app-button title="Add Department" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
-            </app-button>
-        </div>
+        <app-button *appHasPermission="'CREATE_DEPARTMENT'" title="Add Department" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
+            (onClick)="openAddModal()">
+        </app-button>
     </div>
 
     <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
@@ -30,9 +24,6 @@
             <table class="w-full text-sm text-left">
                 <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                     <tr>
-                        <th class="w-10 px-4 py-4">
-                            <input type="checkbox">
-                        </th>
                         <th class="px-6 py-4 font-semibold text-center">
                             Department Code
                         </th>
@@ -53,12 +44,9 @@
                             </div>
                         </td>
                     </tr>
-                    <ng-container *ngIf="!isLoading && department.length > 0">
-                        <tr *ngFor="let item of department"
+                    <ng-container *ngIf="!isLoading && filteredData.length > 0">
+                        <tr *ngFor="let item of paginatedData"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
-                            <td class="px-4 py-4">
-                                <input type="checkbox">
-                            </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading text-center">
                                     {{ item.departmentCode }}
@@ -71,14 +59,14 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button (onClick)="openEditModal(item)" icon="square-pen"
+                                    <app-button *appHasPermission="'UPDATE_DEPARTMENT'" (onClick)="openEditModal(item)" icon="square-pen"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button (onClick)="deleteDepartment(item.departmentId)" icon="trash-2"
-                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                    <app-button *appHasPermission="'DELETE_DEPARTMENT'" (onClick)="deleteDepartment(item.departmentId)"
+                                        icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
                                     </app-button>
@@ -86,7 +74,7 @@
                             </td>
                         </tr>
                     </ng-container>
-                    <tr *ngIf="!isLoading && department.length === 0">
+                    <tr *ngIf="!isLoading && filteredData.length === 0">
                         <td colspan="9">
                             <div class="py-16 text-center">
                                 <div class="text-lg font-medium text-heading">
@@ -106,10 +94,10 @@
                 Total Department: {{ department.length }}
             </span>
             <div class="flex gap-2">
-                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1"  title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
 
-                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages"  title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
             </div>
         </div>

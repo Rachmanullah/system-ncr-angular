@@ -20,6 +20,9 @@ import Swal from 'sweetalert2';
 import { SelectInputComponent } from '../../component/selectInput/selectInput';
 import { selectInput } from '../../core/class/selectInput.class';
 import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
+import { SearchInputComponent } from '../../component/searchInput/searchInput';
+import { HasPermissionDirective } from '../../helper/permissionDirective';
+import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class';
 
 @Component({
     selector: 'app-user',
@@ -32,7 +35,9 @@ import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
         CircularProgressComponent,
         ModalComponent,
         SelectInputComponent,
-        BreadCrumbComponent
+        BreadCrumbComponent,
+        SearchInputComponent,
+        HasPermissionDirective
     ],
     templateUrl: './user.component.html',
 })
@@ -42,6 +47,7 @@ export class UsersComponent implements OnInit {
     protected readonly BUTTON_RADIUS = BUTTON_RADIUS;
 
     users: UserBase[] = [];
+    filteredData: UserBase[] = [];
     roles: selectInput[] = [];
     department: selectInput[] = [];
     selectedUserId: number = 0;
@@ -54,7 +60,9 @@ export class UsersComponent implements OnInit {
         departmentId: 0,
         roleId: 0,
     });
-
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
     showModal = false;
     isLoading = true;
     submitting = false;
@@ -148,6 +156,7 @@ export class UsersComponent implements OnInit {
                 value: x.departmentId
             }));
             this.isLoading = false;
+            this.applyFilter('');
         });
     }
 
@@ -156,10 +165,40 @@ export class UsersComponent implements OnInit {
             next: (res) => {
                 this.users = res.data ?? [];
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: () => (this.isLoading = false),
             complete: () => this.cdr.detectChanges(),
         });
+    }
+
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+        let searchText = '';
+
+        if (typeof filter === 'string') {
+            searchText = filter;
+        } else {
+            searchText = filter?.text ?? '';
+        }
+        const text = searchText.toLowerCase();
+        this.filteredData = this.users.filter(a =>
+            (a.fullname ?? '').toLowerCase().includes(text) ||
+            (a.username ?? '').toLowerCase().includes(text) ||
+            (a.role.roleName ?? '').toLowerCase().includes(text) ||
+            (a.department.departmentCode ?? '').toLowerCase().includes(text)
+        );
+        this.currentPage = 1;
+        this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+
+    get paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filteredData.slice(start, start + this.itemsPerPage);
+    }
+
+    changePage(page: number) {
+        if (page < 1 || page > this.totalPages) return;
+        this.currentPage = page;
     }
 
     openAddModal() {

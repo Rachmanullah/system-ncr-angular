@@ -8,7 +8,7 @@ import { ApiMessageResponse } from "../core/http/apiMessageResponse";
 
 @Injectable({ providedIn: 'root' })
 export class RoleMenuService extends BaseApiService {
-    private endpoint = `${this.apiUrl}/master/settings/rolemenu`;
+    private endpoint = `${this.apiUrl}/settings/rolemenu`;
 
     constructor(http: HttpClient) {
         super(http);

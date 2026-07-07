@@ -86,7 +86,7 @@ export class LoginComponent {
             },
             error: (error) => {
                 this.isLoading.set(false);
-                Swal.fire('Error', error.message, 'error');
+                Swal.fire('Error', error.error.message, 'error');
                 console.error(error);
             }
         });

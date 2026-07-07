@@ -1,4 +1,6 @@
-export interface NCRBase {
+import { NCRDetailBase, NCRDetailRequest, NCRLogsBase } from "./ncr.class";
+
+export interface InboxBase {
     ncrId                   : number;
     ncrNumber               : string;
     ncrDate                 : string;
@@ -15,24 +17,13 @@ export interface NCRBase {
     statusCode              : string;
     statusName              : string;
     runningNumber           : number;
-    approver?               : number;
+    approver                : number;
+    approverNotes           : string;
     ncrDetail               : NCRDetailBase;
     ncrLogs                 : NCRLogsBase[];
 }
 
-export interface NCRDetailBase {
-    ncrDetailId             : number;
-    description             : string;
-    priority                : string;
-    asIs                    : string;
-    toBe                    : string;
-    benefit                 : string;
-    impact                  : string;
-    financialImpact         : string;
-}
-
-
-export interface NCRRequest {
+export interface InboxRequest {
     ncrTitle                : string;
     ncrNumber               : string;
     ncrProject              : string;
@@ -47,26 +38,8 @@ export interface NCRRequest {
     action                  : string;
     statusCode              : string;
     statusName              : string;
-    approver?               : number;
+    runningNumber           : number;
+    approver                : number;
+    approverNotes           : string;
     detail                  : NCRDetailRequest;
-}
-
-export interface NCRDetailRequest {
-    description             : string;
-    priority                : string;
-    asIs                    : string;
-    toBe                    : string;
-    benefit                 : string;
-    impact                  : string;
-    financialImpact         : string;    
-}
-
-export interface NCRLogsBase {
-    ncrLogsId?               : number;
-    orderNumber?             : number;
-    statusName?              : string;
-    notes?                   : string;
-    date?                    : string;
-    username?                : string;
-    userPosition?            : string;
 }

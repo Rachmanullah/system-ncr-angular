@@ -57,7 +57,8 @@ export class AuthService extends BaseApiService{
             "departmentId": payload.departmentId,
             "departmentName": payload.departmentName,
             "roleId": payload.roleId,
-            "roleName": payload.roleName
+            "roleName": payload.roleName,
+            "permission": payload.rolePermission
         };
         console.log("userData :", JSON.stringify(userData));
         localStorage.setItem('user', JSON.stringify(userData));
@@ -69,6 +70,16 @@ export class AuthService extends BaseApiService{
 
     logout() {
         localStorage.clear();
+    }
+
+    hasPermission(action: string): boolean {
+        const user = this.userSubject.value;
+        if (!user || !user.permission) return false;
+        return user.permission.includes(action);
+    }
+
+    hasAnyPermission(actions: string[]): boolean {
+        return actions.some(action => this.hasPermission(action));
     }
 
     getUser() {

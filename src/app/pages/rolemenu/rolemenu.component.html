@@ -1,5 +1,5 @@
 <div class="p-6 space-y-6">
-    <app-breadcrumb [items]="[{ title: 'System', icon: 'settings' }, { title: 'Role Menu', icon: 'shield' }]">
+    <app-breadcrumb [items]="[{ title: 'Settings', icon: 'settings' }, { title: 'Role Menu', icon: 'shield' }]">
     </app-breadcrumb>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -11,13 +11,10 @@
             </p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
-            <div class="relative">
-                <input type="text" placeholder="Search Role Menu..."
-                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
+            <div>
+                <app-search-input (search)="applyFilter($event)"></app-search-input>
             </div>
-            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
-            </app-button>
-            <app-button title="Add Role Menu" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
+            <app-button *appHasPermission="'CREATE_ROLE_MENU'"  title="Add Role Menu" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
                 (onClick)="openAddModal()">
             </app-button>
         </div>
@@ -53,8 +50,8 @@
                             </div>
                         </td>
                     </tr>
-                    <ng-container *ngIf="!isLoading && rolemenus.length > 0">
-                        <tr *ngFor="let item of rolemenus"
+                    <ng-container *ngIf="!isLoading && filteredData.length > 0">
+                        <tr *ngFor="let item of paginatedData"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
                             <td class="px-4 py-4">
                                 <input type="checkbox">
@@ -79,13 +76,13 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button (onClick)="openEditModal(item)" icon="square-pen"
+                                    <app-button *appHasPermission="'UPDATE_ROLE_MENU'" (onClick)="openEditModal(item)" icon="square-pen"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button (onClick)="deleteRoleMenu(item.roleMenuId)" icon="trash-2"
+                                    <app-button *appHasPermission="'DELETE_ROLE_MENU'" (onClick)="deleteRoleMenu(item.roleMenuId)" icon="trash-2"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
@@ -94,7 +91,7 @@
                             </td>
                         </tr>
                     </ng-container>
-                    <tr *ngIf="!isLoading && rolemenus.length === 0">
+                    <tr *ngIf="!isLoading && filteredData.length === 0">
                         <td colspan="5">
                             <div class="py-16 text-center">
                                 <div class="text-lg font-medium text-heading">
@@ -114,10 +111,10 @@
                 Total Role Menu: {{ rolemenus.length }}
             </span>
             <div class="flex gap-2">
-                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1"  title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
 
-                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages" title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
             </div>
         </div>

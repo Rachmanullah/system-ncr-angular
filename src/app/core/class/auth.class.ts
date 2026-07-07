@@ -8,6 +8,7 @@ export interface AuthBase {
     departmentName?: string;
     roleId?: number;
     roleName?: string;
+    permission?: string[];
     token?: string;
 }
 

@@ -14,16 +14,11 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-
-            <div class="relative">
-                <input type="text" placeholder="Search user..."
-                    class="w-full sm:w-72 px-4 py-2 rounded-base border border-default bg-neutral-primary-soft focus:outline-none focus:ring-2 focus:ring-brand-soft">
+            <div>
+                <app-search-input (search)="applyFilter($event)"></app-search-input>
             </div>
-
-            <app-button title="Filter" [variant]="BUTTON_VARIANTS.OUTLINE">
-            </app-button>
-
-            <app-button title="Add User" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
+            <app-button *appHasPermission="'CREATE_USER'" title="Add User" icon="plus"
+                [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
             </app-button>
         </div>
     </div>
@@ -33,10 +28,6 @@
             <table class="w-full text-sm text-left">
                 <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                     <tr>
-                        <th class="w-10 px-4 py-4 text-center">
-                            <input type="checkbox">
-                        </th>
-
                         <th class="px-6 py-4 font-semibold text-center">
                             Name
                         </th>
@@ -79,13 +70,9 @@
                         </td>
                     </tr>
 
-                    <ng-container *ngIf="!isLoading && users.length > 0">
-                        <tr *ngFor="let user of users"
+                    <ng-container *ngIf="!isLoading && filteredData.length > 0">
+                        <tr *ngFor="let user of paginatedData"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
-                            <td class="px-4 py-4">
-                                <input type="checkbox">
-                            </td>
-
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading">
                                     {{ user.fullname }}
@@ -123,13 +110,14 @@
 
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button (onClick)="openEditModal(user)" icon="square-pen"
-                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                    <app-button *appHasPermission="'UPDATE_USER'" (onClick)="openEditModal(user)"
+                                        icon="square-pen" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button (onClick)="deleteUser(user.userId)" icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                    <app-button *appHasPermission="'DELETE_USER'" (onClick)="deleteUser(user.userId)"
+                                        icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
                                     </app-button>
@@ -137,7 +125,7 @@
                             </td>
                         </tr>
                     </ng-container>
-                    <tr *ngIf="!isLoading && users.length === 0">
+                    <tr *ngIf="!isLoading && filteredData.length === 0">
                         <td colspan="9">
                             <div class="py-16 text-center">
                                 <div class="text-lg font-medium text-heading">
@@ -157,10 +145,12 @@
                 Total Users: {{ users.length }}
             </span>
             <div class="flex gap-2">
-                <app-button title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1" title="Previous"
+                    icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
 
-                <app-button title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages" title="Next"
+                    icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
             </div>
         </div>

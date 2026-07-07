@@ -1,0 +1,21 @@
+<div class="w-full">
+    <label *ngIf="label" class="block mb-2 text-sm font-medium text-gray-700">
+        {{ label }}
+    </label>
+
+    <ul class="text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-xl shadow-sm">
+        <li *ngFor="let item of options; let last = last" class="w-full" [class.border-b]="!last">
+            <div class="flex items-center px-4 py-3">
+                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    [checked]="isChecked(item.value)" [disabled]="disabled"
+                    (change)="onCheckboxChange($any($event.target).checked, item.value)" />
+                <label class="ml-3 text-sm text-gray-700 cursor-pointer">
+                    {{ item.label }}
+                </label>
+            </div>
+        </li>
+    </ul>
+    <p *ngIf="error" class="mt-1 text-xs text-red-500">
+        {{ error }}
+    </p>
+</div>

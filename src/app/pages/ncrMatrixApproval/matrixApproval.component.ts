@@ -15,6 +15,11 @@ import { ApproverRequest } from "../../core/class/approver.class";
 import Swal from "sweetalert2";
 import { SelectInputComponent } from "../../component/selectInput/selectInput";
 import { generateMatrixNumber } from "../../helper/generateMatrixNumber";
+import { AuthService } from "../../service/auth.service";
+import { AuthBase } from "../../core/class/auth.class";
+import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class";
+import { SearchInputComponent } from "../../component/searchInput/searchInput";
+import { HasPermissionDirective } from "../../helper/permissionDirective";
 
 @Component({
     selector: 'app-ncr-matrix',
@@ -27,7 +32,9 @@ import { generateMatrixNumber } from "../../helper/generateMatrixNumber";
         CircularProgressComponent,
         SelectInputComponent,
         ModalComponent,
-        BreadCrumbComponent
+        BreadCrumbComponent,
+        SearchInputComponent,
+        HasPermissionDirective
     ],
     templateUrl: './matrixApproval.component.html',
 })
@@ -37,11 +44,23 @@ export class NCRMatrixApprovalComponent implements OnInit {
     protected readonly BUTTON_RADIUS = BUTTON_RADIUS;
     private route = inject(ActivatedRoute);
 
+    user: AuthBase = {
+            userId: 0,
+            fullname: '',
+            position: '',
+            departmentId: 0,
+            departmentName: '',
+            roleName: ''
+        };
     matrixs: NCRMatrixBase[] = [];
+    filteredData: NCRMatrixBase[]=[];
     approverData: selectInput[] = [];
     departmentData: selectInput[] = [];
     departments: any[] = [];
     selectedMatrixId: number = 0;
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
     approverList = signal<ApproverRequest[]>([]);
     selectedMatrix = signal<NCRMatrixRequest>({
         ncrMatrixCode: '',
@@ -128,10 +147,14 @@ export class NCRMatrixApprovalComponent implements OnInit {
 
     constructor(
         private matrixApprovalService: NCRMatrixApprovalService,
+        private authService: AuthService,
         private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
+        this.authService.user$.subscribe(user => {
+            this.user = user;
+        });
         this.loadData();
     }
 
@@ -141,7 +164,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
             this.matrixs = data['matrixApprovalData'];
             this.departments = data['departmentData'] ?? [];
             this.approverData = (data['userData'] ?? []).map((res: any) => ({
-                label: res.fullname,
+                label: res.fullname + '-' + res.position,
                 value: res.userId
             }))
             this.departmentData = (data['departmentData'] ?? []).map((res: any) => ({
@@ -149,6 +172,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
                 value: res.departmentId
             }))
             this.isLoading = false;
+            this.applyFilter('');
         })
     }
 
@@ -157,6 +181,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
             next: (res) => {
                 this.matrixs = res.data ?? [];
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: (err) => {
                 console.log(err);
@@ -165,6 +190,34 @@ export class NCRMatrixApprovalComponent implements OnInit {
             complete: () => { this.cdr.detectChanges(); }
         });
     }
+
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+            let searchText = '';
+    
+            if (typeof filter === 'string') {
+                searchText = filter;
+            } else {
+                searchText = filter?.text ?? '';
+            }
+            const text = searchText.toLowerCase();
+            this.filteredData = this.matrixs.filter(a =>
+                (a.departmentCode ?? '').toLowerCase().includes(text) ||
+                (a.departmentName ?? '').toLowerCase().includes(text) ||
+                (a.ncrMatrixCode ?? '').toLowerCase().includes(text)
+            );
+            this.currentPage = 1;
+            this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+        }
+    
+        get paginatedData() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.filteredData.slice(start, start + this.itemsPerPage);
+        }
+    
+        changePage(page: number) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+        }
 
     openAddApproverModal() {
         this.showApproverErrors.set(false);
@@ -259,7 +312,17 @@ export class NCRMatrixApprovalComponent implements OnInit {
         const user = this.approverData.find(
             x => Number(x.value) === id
         );
-        return user?.label ?? '-';
+        if (!user?.label) return '-';
+        return user.label.split('-')[0].trim();
+    }
+
+    getApproverPosition(id: number): string{
+        const user = this.approverData.find(
+            x=> Number(x.value) === id
+        );
+        if(!user?.label) return '-';
+
+        return user.label.split('-')[1].trim();
     }
 
     openEditModal(matrix: NCRMatrixBase) {

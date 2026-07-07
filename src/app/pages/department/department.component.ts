@@ -11,6 +11,11 @@ import { DepartmentBase, DepartmentRequest } from "../../core/class/department.c
 import { DepartmentService } from "../../service/department.service";
 import { ActivatedRoute } from "@angular/router";
 import Swal from "sweetalert2";
+import { SearchInputComponent } from "../../component/searchInput/searchInput";
+import { AuthBase } from "../../core/class/auth.class";
+import { UserService } from "../../service/user.service";
+import { AuthService } from "../../service/auth.service";
+import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class";
 
 @Component({
     selector: 'app-department',
@@ -22,7 +27,8 @@ import Swal from "sweetalert2";
         InputComponent,
         CircularProgressComponent,
         ModalComponent,
-        BreadCrumbComponent
+        BreadCrumbComponent,
+        SearchInputComponent
     ],
     templateUrl: './department.component.html',
 })
@@ -31,8 +37,16 @@ export class DepartmentComponent implements OnInit {
     protected readonly BUTTON_SIZES = BUTTON_SIZES;
     protected readonly BUTTON_RADIUS = BUTTON_RADIUS;
     private route = inject(ActivatedRoute);
-
+    user: AuthBase = {
+        userId: 0,
+        fullname: '',
+        position: '',
+        departmentId: 0,
+        departmentName: '',
+        roleName: ''
+    };
     department: DepartmentBase[] = [];
+    filteredData: DepartmentBase[] = [];
     selectedDepartmentId: number = 0;
     selectedDepartment = signal<DepartmentRequest>({
         departmentCode: '',
@@ -42,6 +56,9 @@ export class DepartmentComponent implements OnInit {
     showModal = false;
     isLoading = true;
     submitting = false;
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
     modalMode: 'add' | 'edit' = 'add';
     showErrors = signal(false);
     backendErrors = signal<Partial<Record<keyof DepartmentRequest, string>>>({});
@@ -78,22 +95,54 @@ export class DepartmentComponent implements OnInit {
 
     constructor(
         private departmentService: DepartmentService,
+        private authService: AuthService,
         private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
+        this.authService.user$.subscribe(user => {
+            this.user = user;
+        });
         this.route.data.subscribe((data) => {
             console.log(data);
             this.department = data['departmentData'];
             this.isLoading = false;
+            this.applyFilter('');
         })
     }
 
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+        let searchText = '';
+
+        if (typeof filter === 'string') {
+            searchText = filter;
+        } else {
+            searchText = filter?.text ?? '';
+        }
+        const text = searchText.toLowerCase();
+        this.filteredData = this.department.filter(a =>
+            (a.departmentCode ?? '').toLowerCase().includes(text) ||
+            (a.departmentName ?? '').toLowerCase().includes(text)
+        );
+        this.currentPage = 1;
+        this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+
+    get paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filteredData.slice(start, start + this.itemsPerPage);
+    }
+
+    changePage(page: number) {
+        if (page < 1 || page > this.totalPages) return;
+        this.currentPage = page;
+    }
     fetchDepartment() {
         this.departmentService.getAllDepartment().subscribe({
             next: (res) => {
                 this.department = res.data ?? [];
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: (err) => {
                 console.log(err);

@@ -8,7 +8,7 @@ import { ApiMessageResponse } from "../core/http/apiMessageResponse";
 
 @Injectable({ providedIn: 'root' })
 export class NCRMatrixApprovalService extends BaseApiService {
-    private endpoint = `${this.apiUrl}/master/matrix`;
+    private endpoint = `${this.apiUrl}/ncr/matrix`;
 
     constructor(http: HttpClient) {
         super(http);

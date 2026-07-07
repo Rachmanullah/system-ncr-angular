@@ -7,7 +7,7 @@ import { ApiMessageResponse } from "../core/http/apiMessageResponse";
 import { Injectable } from "@angular/core";
 @Injectable({ providedIn: 'root' })
 export class UserService extends BaseApiService{
-    private endpoint = `${this.apiUrl}/master/users`;
+    private endpoint = `${this.apiUrl}/system/users`;
 
     constructor(http: HttpClient) {
         super(http);

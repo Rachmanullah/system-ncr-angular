@@ -1,68 +1,56 @@
 <div class="p-6 space-y-6">
-    <app-breadcrumb [items]="[{ title: 'System', icon: 'settings' }, { title: 'Roles', icon: 'shield' }]">
+    <app-breadcrumb [items]="[{ title: 'Settings', icon: 'settings' }, { title: 'Permissions', icon: 'shield-x' }]">
     </app-breadcrumb>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
         <div>
             <h1 class="text-3xl font-bold text-heading">
-                Master Roles
+                Permission
             </h1>
-
             <p class="mt-1 text-sm text-body-muted">
-                Manage application role
+                Manage Permission
             </p>
         </div>
-
         <div>
             <app-search-input (search)="applyFilter($event)"></app-search-input>
         </div>
     </div>
-
     <div class="grid grid-cols-2 gap-4">
         <div class="bg-neutral-primary-soft border border-default rounded-lg shadow p-5">
             <div class="mb-5">
                 <h2 class="text-xl font-semibold text-heading">
-                    {{ formMode() === FormMode.CREATE ? 'Create Role' : 'Update Role' }}
+                    {{ formMode() === FormMode.CREATE ? 'Create Permission' : 'Update Permission' }}
                 </h2>
                 <p class="text-sm text-body-muted">
                     {{
                     formMode() === FormMode.CREATE
-                    ? 'Create a new role.'
-                    : 'Update selected role.'
+                    ? 'Create a new permission.'
+                    : 'Update selected permission.'
                     }}
                 </p>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <app-input label="Full Name" [ngModel]="selectedRole().roleName"
-                        (ngModelChange)="updateField('roleName', $event)"
-                        [error]="showErrors() ? validationErrors().roleName : ''">
-                    </app-input>
-                </div>
-                <div>
-                    <app-select-input label="Status" placeholder="Select Status" [options]="statusData"
-                        [ngModel]="selectedRole().status" (ngModelChange)="updateField('status', +$event)"
-                        [error]="showErrors() ? validationErrors().status : ''">
-                    </app-select-input>
-                </div>
+            <div class="space-y-4">
+                <app-input label="Permission Code" [ngModel]="selectedPermission().permissionCode"
+                    (ngModelChange)="updateField('permissionCode', $event)"
+                    [error]="showErrors() ? validationErrors().permissionCode : ''">
+                </app-input>
+                <app-input label="Permission Description" [ngModel]="selectedPermission().permissionDescription"
+                    (ngModelChange)="updateField('permissionDescription', $event)"
+                    [error]="showErrors() ? validationErrors().permissionDescription : ''">
+                </app-input>
+                <app-select-input label="Status" placeholder="Select Status" [options]="statusData"
+                    [ngModel]="selectedPermission().isActive" (ngModelChange)="updateField('isActive', +$event)"
+                    [error]="showErrors() ? validationErrors().isActive : ''">
+                </app-select-input>
             </div>
-            <div class="mt-6">
-                <label class="block mb-3 text-sm font-medium text-gray-700">
-                    Permissions
-                </label>
-                <div class="grid grid-cols-3 gap-4">
-                    <app-checkbox *ngFor="let column of permissionColumns" [options]="column"
-                        [(ngModel)]="selectedPermissions">
-                    </app-checkbox>
-                </div>
+            <div class="flex gap-3 mt-6">
+                <app-button [title]="formMode() === FormMode.CREATE ? 'Create' : 'Update'" icon="save"
+                    [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="submitPermission()">
+                </app-button>
+
+                <app-button *ngIf="formMode() === FormMode.UPDATE" title="Cancel" icon="x"
+                    [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="resetForm()">
+                </app-button>
             </div>
-            <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="resetForm()" customClass="mr-2">
-            </app-button>
-            <app-button [title]="formMode() === FormMode.CREATE
-                    ? 'Create Role'
-                    : 'Update Role'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveRole()"
-                customClass="mt-2">
-            </app-button>
         </div>
         <div class="bg-neutral-primary-soft border border-default rounded-lg shadow overflow-hidden">
             <div class="overflow-x-auto">
@@ -70,10 +58,13 @@
                     <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                         <tr>
                             <th class="px-6 py-4 font-semibold text-center">
-                                Role Name
+                                Permission Code
                             </th>
                             <th class="px-6 py-4 font-semibold text-center">
-                                Status
+                                Permission Description
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-center">
+                                Is Active
                             </th>
                             <th class="px-6 py-4 font-semibold text-center">
                                 Action
@@ -82,7 +73,7 @@
                     </thead>
                     <tbody>
                         <tr *ngIf="isLoading">
-                            <td colspan="3" class="py-16">
+                            <td colspan="4" class="py-16">
                                 <div class="flex justify-center">
                                     <app-circularProgress [isLoading]="true">
                                     </app-circularProgress>
@@ -90,31 +81,36 @@
                             </td>
                         </tr>
                         <ng-container *ngIf="!isLoading && filteredData.length > 0">
-                            <tr *ngFor="let role of paginatedData"
+                            <tr *ngFor="let item of paginatedData"
                                 class="border-b border-default hover:bg-neutral-secondary-medium transition">
                                 <td class="px-6 py-4">
-                                    <div class="font-medium text-heading">
-                                        {{ role.roleName }}
+                                    <div class="font-medium text-heading text-center">
+                                        {{ item.permissionCode }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-heading text-center">
+                                        {{ item.permissionDescription }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium" [ngClass]="{
-                                        'bg-green-100 text-green-700': !role.status,
-                                        'bg-red-100 text-red-700': role.status
+                                        'bg-green-100 text-green-700': !item.isActive,
+                                        'bg-red-100 text-red-700': item.isActive
                                     }">
-                                        {{ role.status ? 'Inactive' : 'Active' }}
+                                        {{ item.isActive ? 'Inactive' : 'Active' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 justify-items-center">
                                     <div class="flex items-center gap-4">
-                                        <app-button *appHasPermission="'UPDATE_ROLE'" (onClick)="editRole(role)" icon="square-pen"
+                                        <app-button *appHasPermission="'UPDATE_PERMISSION'" (onClick)="editPermission(item)" icon="square-pen"
                                             [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                             [variant]="BUTTON_VARIANTS.OUTLINE"
                                             customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                         </app-button>
 
-                                        <app-button *appHasPermission="'DELETE_ROLE'" (onClick)="deleteRole(role)" icon="trash-2"
-                                            [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        <app-button *appHasPermission="'DELETE_PERMISSION'" (onClick)="deletePermission(item)"
+                                            icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                             [variant]="BUTTON_VARIANTS.OUTLINE"
                                             customClass="border-red-500 text-red-600 hover:bg-red-50">
                                         </app-button>
@@ -123,13 +119,13 @@
                             </tr>
                         </ng-container>
                         <tr *ngIf="!isLoading && filteredData.length === 0">
-                            <td colspan="3">
+                            <td colspan="4">
                                 <div class="py-16 text-center">
                                     <div class="text-lg font-medium text-heading">
-                                        No Role Found
+                                        No Permission Found
                                     </div>
                                     <div class="mt-2 text-sm text-body-muted">
-                                        There is no role data available.
+                                        There is no permission data available.
                                     </div>
                                 </div>
                             </td>
@@ -139,7 +135,7 @@
             </div>
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-default">
                 <span class="text-sm text-body-muted">
-                    Total Role: {{ roles.length }}
+                    Total Permission: {{ permissionData.length }}
                 </span>
                 <div class="flex gap-2">
                     <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1" title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">

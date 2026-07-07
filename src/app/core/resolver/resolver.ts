@@ -15,6 +15,10 @@ import { NCRMatrixBase } from "../class/matrix.class";
 import { NCRMatrixApprovalService } from "../../service/matrixApproval.service";
 import { NCRBase } from "../class/ncr.class";
 import { NCRService } from "../../service/ncr.service";
+import { InboxService } from "../../service/inbox.service";
+import { InboxBase } from "../class/inbox.class";
+import { PermissionBase } from "../class/permission.class";
+import { PermissionService } from "../../service/permission.service";
 
 export const userResolver: ResolveFn<UserBase[]> = (route, state) => {
     const service = inject(UserService);
@@ -67,6 +71,22 @@ export const matrixApprovalResolver: ResolveFn<NCRMatrixBase[]> = (route, state)
 export const ncrResolver: ResolveFn<NCRBase[]> = (route, state) => {
     const service = inject(NCRService);
     return service.getAllNcr().pipe(
+        map(res => res.data ?? []),
+        catchError(() => of([]))
+    );
+}
+
+export const inboxResolver: ResolveFn<InboxBase[]> = (route, state) => {
+    const service = inject(InboxService);
+    return service.getAllNcrNeedApprove().pipe(
+        map(res => res.data ?? []),
+        catchError(() => of([]))
+    );
+}
+
+export const permissionResolver: ResolveFn<PermissionBase[]> = (route, state) => {
+    const service = inject(PermissionService);
+    return service.getAllPermission().pipe(
         map(res => res.data ?? []),
         catchError(() => of([]))
     );

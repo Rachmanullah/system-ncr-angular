@@ -22,6 +22,9 @@ import { TabItem, TabsComponent } from '../../component/tabs/tabs.component';
 import { TextareaComponent } from '../../component/textArea/textarea.component';
 import Swal from 'sweetalert2';
 import { NCRMatrixBase } from '../../core/class/matrix.class';
+import { HasPermissionDirective } from '../../helper/permissionDirective';
+import { SearchInputComponent } from '../../component/searchInput/searchInput';
+import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class';
 
 @Component({
     selector: 'app-ncr',
@@ -37,6 +40,8 @@ import { NCRMatrixBase } from '../../core/class/matrix.class';
         SelectInputComponent,
         TabsComponent,
         TextareaComponent,
+        HasPermissionDirective,
+        SearchInputComponent
     ],
     templateUrl: './ncr.component.html',
 })
@@ -68,6 +73,7 @@ export class NCRComponent implements OnInit {
         roleName: ''
     };
     ncrData: NCRBase[] = [];
+    filteredData: NCRBase[]=[];
     ncrMatrixData: NCRMatrixBase[] = [];
     selectMatrixData: NCRMatrixBase = {
         ncrMatrixId: 0,
@@ -108,12 +114,15 @@ export class NCRComponent implements OnInit {
     showModal = false;
     isLoading = true;
     submitting = false;
-    modalMode: 'add' | 'edit' = 'add';
+    modalMode= signal<'add' | 'edit'>('add');
     showErrors = signal(false);
     backendErrors = signal<Record<string, string>>({});
     showApproverErrors = signal(false);
     activeTab = signal('detail');
-
+    currentPage = 1;
+    itemsPerPage = 10;
+    totalPages = 1;
+    
     tabs: TabItem[] = [
         {
             id: 'detail',
@@ -199,9 +208,22 @@ export class NCRComponent implements OnInit {
     isAdministrator(): boolean {
         return this.user?.roleName === 'Administrator';
     }
-    isCancelled = computed(() =>
-        this.selectedNcr().statusCode === 'NCR_CCL' || this.selectedNcr().requestorId != this.user.userId
-    );
+
+    isReadonly = computed(() => {
+        const ncr = this.selectedNcr();
+        const mode = this.modalMode();
+
+        const statusLocked = ncr.statusCode === 'NCR_CCL' || ncr.statusCode === 'NCR_WAP';
+        const notOwner = ncr.requestorId != this.user.userId;
+
+        const noWritePermission = mode === 'add'
+            ? !this.authService.hasPermission('CREATE_NCR')
+            : !this.authService.hasPermission('UPDATE_NCR');
+
+        return statusLocked || notOwner || noWritePermission;
+    });
+
+    canSubmit = computed(() => this.authService.hasPermission('SUBMIT_NCR'));
     loadData() {
         this.route.data.subscribe((data) => {
             this.ncrData = (data['ncrData'] ?? []).filter((ncr: NCRBase) => {
@@ -215,6 +237,7 @@ export class NCRComponent implements OnInit {
                 ncrDate: formatDate(res.ncrDate),
             }));
             this.ncrMatrixData = data['matrixApprovalData'];
+            this.applyFilter('');
             this.isLoading = false;
         });
     }
@@ -229,6 +252,7 @@ export class NCRComponent implements OnInit {
                     return ncr.requestorId === this.user.userId;
                 });
                 this.isLoading = false;
+                this.applyFilter('');
             },
             error: (err) => {
                 console.log(err);
@@ -257,11 +281,42 @@ export class NCRComponent implements OnInit {
         }
     }
 
+    applyFilter(filter?: SearchFilterPayload | string | null) {
+            let searchText = '';
+    
+            if (typeof filter === 'string') {
+                searchText = filter;
+            } else {
+                searchText = filter?.text ?? '';
+            }
+            const text = searchText.toLowerCase();
+            this.filteredData = this.ncrData.filter(a =>
+                (a.ncrNumber ?? '').toLowerCase().includes(text) ||
+                (a.departmentName ?? '').toLowerCase().includes(text) ||
+                (a.ncrCategory ?? '').toLowerCase().includes(text) ||
+                (a.ncrProject ?? '').toLowerCase().includes(text) ||
+                (a.ncrTitle ?? '').toLowerCase().includes(text) ||
+                (a.requestorName ?? '').toLowerCase().includes(text)
+            );
+            this.currentPage = 1;
+            this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+        }
+    
+        get paginatedData() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.filteredData.slice(start, start + this.itemsPerPage);
+        }
+    
+        changePage(page: number) {
+            if (page < 1 || page > this.totalPages) return;
+            this.currentPage = page;
+        }
+
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});
         this.selectedNcrLogs = [];
-        this.modalMode = 'add';
+        this.modalMode.set("add")
         const ncrDate = formatDate2(new Date()) ?? '';
         this.selectedNcr.set({
             ncrTitle: '',
@@ -289,7 +344,7 @@ export class NCRComponent implements OnInit {
         const ncrDate = formatDate2(item.ncrDate) ?? '';
         const ncrImplementationDate = formatDate2(item.ncrImplementationDate) ?? '';
         this.backendErrors.set({});
-        this.modalMode = 'edit';
+        this.modalMode.set("edit");
         this.selectedNcrId = item.ncrId;
         this.selectedNcr.set({
             ncrTitle: item.ncrTitle,
@@ -348,7 +403,7 @@ export class NCRComponent implements OnInit {
             Swal.fire('Warning', 'Matrix Approval Not Found For Department', 'warning');
             return;
         }
-        if (this.modalMode === 'add') {
+        if (this.modalMode() === 'add') {
             console.log('ADD NCR');
             this.ncrService.createNcr(payload).subscribe({
                 next: (res) => {
