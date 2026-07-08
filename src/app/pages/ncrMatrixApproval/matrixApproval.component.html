@@ -78,7 +78,7 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button *appHasPermission="'UPDATE_MATRIX'" (onClick)="openEditModal(item)" icon="square-pen"
+                                    <app-button *appHasPermission="'VIEW_MATRIX'" (onClick)="openEditModal(item)" icon="square-pen"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
@@ -122,7 +122,7 @@
         </div>
     </div>
 </div>
-<app-modal *ngIf="showModal" [title]="modalMode === 'add'
+<app-modal *ngIf="showModal" [title]="modalMode() === 'add'
         ? 'Add Matrix Approval'
         : 'Edit Matrix Approval'" size="lg" (close)="closeModal()" width=800>
     <div modal-body>
@@ -137,12 +137,13 @@
                 <app-select-input label="Department" placeholder="Select Department" [options]="departmentData"
                     [ngModel]="selectedMatrix().departmentId"
                     (ngModelChange)="onDepartmentChange(+$event)"
-                    [error]="showErrors() ? validationErrors().departmentId : ''">
+                    [error]="showErrors() ? validationErrors().departmentId : ''"
+                    [disabled]="noWritePermission()">
                 </app-select-input>
             </div>
         </div>
         <div class="flex items-center justify-end gap-5  mt-10">
-            <app-button title="Add Approver" [radius]="BUTTON_RADIUS.FULL"
+            <app-button *ngIf="!noWritePermission()" title="Add Approver" [radius]="BUTTON_RADIUS.FULL"
                 (onClick)="openAddApproverModal()"></app-button>
         </div>
         <div class="overflow-x-auto mt-10">
@@ -183,10 +184,10 @@
                         </td>
                         <td class="px-4 py-4 justify-items-center">
                             <div class="flex items-center gap-4">
-                                <app-button icon="square-pen" (onClick)="openEditApproverModal(i)"
+                                <app-button *ngIf="!noWritePermission()" icon="square-pen" (onClick)="openEditApproverModal(i)"
                                     [variant]="BUTTON_VARIANTS.WARNING">
                                 </app-button>
-                                <app-button icon="trash-2" (onClick)="deleteApprover(i)"
+                                <app-button *ngIf="!noWritePermission()" icon="trash-2" (onClick)="deleteApprover(i)"
                                     [variant]="BUTTON_VARIANTS.DANGER">
                                 </app-button>
                             </div>
@@ -199,9 +200,9 @@
     <div modal-footer>
         <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button [title]="modalMode === 'add'
+        <app-button [title]="modalMode() === 'add'
                 ? 'Create'
-                : 'Update'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveMatrix()"
+                : 'Update'" icon="save" *ngIf="!noWritePermission()" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveMatrix()"
             customClass="mt-2">
         </app-button>
     </div>

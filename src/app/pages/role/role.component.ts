@@ -196,6 +196,14 @@ export class RoleComponent implements OnInit {
         this.currentPage = page;
     }
 
+
+    noWritePermission = computed(() => {
+        const noWritePermission = this.formMode() === FormMode.CREATE
+            ? !this.authService.hasPermission('CREATE_ROLE')
+            : !this.authService.hasPermission('UPDATE_ROLE');
+
+        return noWritePermission;
+    });
     private buildPermissionColumns() {
         const columnCount = 3;
         const perColumn = Math.ceil(this.permissions.length / columnCount);

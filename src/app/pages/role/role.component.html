@@ -34,15 +34,15 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <app-input label="Full Name" [ngModel]="selectedRole().roleName"
+                    <app-input label="Role Name" [ngModel]="selectedRole().roleName"
                         (ngModelChange)="updateField('roleName', $event)"
-                        [error]="showErrors() ? validationErrors().roleName : ''">
+                        [error]="showErrors() ? validationErrors().roleName : ''" [readonly]="noWritePermission()">
                     </app-input>
                 </div>
                 <div>
                     <app-select-input label="Status" placeholder="Select Status" [options]="statusData"
                         [ngModel]="selectedRole().status" (ngModelChange)="updateField('status', +$event)"
-                        [error]="showErrors() ? validationErrors().status : ''">
+                        [error]="showErrors() ? validationErrors().status : ''" [disabled]="noWritePermission()">
                     </app-select-input>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                 </label>
                 <div class="grid grid-cols-3 gap-4">
                     <app-checkbox *ngFor="let column of permissionColumns" [options]="column"
-                        [(ngModel)]="selectedPermissions">
+                        [(ngModel)]="selectedPermissions" [disabled]="noWritePermission()">
                     </app-checkbox>
                 </div>
             </div>
@@ -60,7 +60,7 @@
             </app-button>
             <app-button [title]="formMode() === FormMode.CREATE
                     ? 'Create Role'
-                    : 'Update Role'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveRole()"
+                    : 'Update Role'" *ngIf="!noWritePermission()" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveRole()"
                 customClass="mt-2">
             </app-button>
         </div>

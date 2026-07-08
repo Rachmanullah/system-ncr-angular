@@ -23,6 +23,8 @@ import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
 import { SearchInputComponent } from '../../component/searchInput/searchInput';
 import { HasPermissionDirective } from '../../helper/permissionDirective';
 import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class';
+import { AuthBase } from '../../core/class/auth.class';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
     selector: 'app-user',
@@ -66,10 +68,17 @@ export class UsersComponent implements OnInit {
     showModal = false;
     isLoading = true;
     submitting = false;
-    modalMode: 'add' | 'edit' = 'add';
+    modalMode= signal<'add' | 'edit'>('add');
     showErrors = signal(false);
     backendErrors = signal<Partial<Record<keyof UserRequest, string>>>({});
-
+    user: AuthBase = {
+            userId: 0,
+            fullname: '',
+            position: '',
+            departmentId: 0,
+            departmentName: '',
+            roleName: ''
+        };
     validationErrors = computed(() => {
         const user = this.selectedUser();
         const backend = this.backendErrors();
@@ -141,9 +150,13 @@ export class UsersComponent implements OnInit {
     constructor(
         private userService: UserService,
         private router: Router,
+        private authService: AuthService,
         private cdr: ChangeDetectorRef,
     ) { }
     ngOnInit(): void {
+        this.authService.user$.subscribe(user => {
+            this.user = user;
+        });
         this.route.data.subscribe((data) => {
             console.log(data);
             this.users = data['userData'];
@@ -171,6 +184,14 @@ export class UsersComponent implements OnInit {
             complete: () => this.cdr.detectChanges(),
         });
     }
+
+    noWritePermission = computed(() => {
+        const noWritePermission = this.modalMode() === 'add'
+            ? !this.authService.hasPermission('CREATE_USER')
+            : !this.authService.hasPermission('UPDATE_USER');
+
+        return noWritePermission;
+    });
 
     applyFilter(filter?: SearchFilterPayload | string | null) {
         let searchText = '';
@@ -204,7 +225,7 @@ export class UsersComponent implements OnInit {
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});
-        this.modalMode = 'add';
+        this.modalMode.set('add');
         this.selectedUser.set({
             username: '',
             fullname: '',
@@ -221,7 +242,7 @@ export class UsersComponent implements OnInit {
         this.showErrors.set(false);
         this.backendErrors.set({});
         this.selectedUserId = user.userId;
-        this.modalMode = 'edit';
+        this.modalMode.set('edit');
         this.selectedUser.set({
             username: user.username,
             fullname: user.fullname,
@@ -246,7 +267,7 @@ export class UsersComponent implements OnInit {
         if (!this.isFormValid()) {
             return;
         }
-        if (this.modalMode === 'add') {
+        if (this.modalMode() === 'add') {
             console.log('ADD USER');
             this.userService.createUser(payload).subscribe({
                 next: (res) => {

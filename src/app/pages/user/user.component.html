@@ -110,7 +110,7 @@
 
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button *appHasPermission="'UPDATE_USER'" (onClick)="openEditModal(user)"
+                                    <app-button *appHasPermission="'VIEW_USER'" (onClick)="openEditModal(user)"
                                         icon="square-pen" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
@@ -156,7 +156,7 @@
         </div>
     </div>
 </div>
-<app-modal *ngIf="showModal" [title]="modalMode === 'add'
+<app-modal *ngIf="showModal" [title]="modalMode() === 'add'
         ? 'Add User'
         : 'Edit User'" size="lg" (close)="closeModal()">
     <div modal-body>
@@ -164,42 +164,42 @@
             <div>
                 <app-input label="Full Name" [ngModel]="selectedUser().fullname"
                     (ngModelChange)="updateField('fullname', $event)"
-                    [error]="showErrors() ? validationErrors().fullname : ''">
+                    [error]="showErrors() ? validationErrors().fullname : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-input label="Username" [ngModel]="selectedUser().username"
                     (ngModelChange)="updateField('username', $event)"
-                    [error]="showErrors() ? validationErrors().username : ''">
+                    [error]="showErrors() ? validationErrors().username : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-input type="password" label="Password" [ngModel]="selectedUser().password"
                     (ngModelChange)="updateField('password', $event)"
-                    [error]="showErrors() ? validationErrors().password : ''">
+                    [error]="showErrors() ? validationErrors().password : ''" [disabled]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-input label="Email" [ngModel]="selectedUser().email" (ngModelChange)="updateField('email', $event)"
-                    [error]="showErrors() ? validationErrors().email : ''">
+                    [error]="showErrors() ? validationErrors().email : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-input label="Position" [ngModel]="selectedUser().position"
                     (ngModelChange)="updateField('position', $event)"
-                    [error]="showErrors() ? validationErrors().position : ''">
+                    [error]="showErrors() ? validationErrors().position : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-select-input label="Department" placeholder="Select Department" [options]="department"
                     [ngModel]="selectedUser().departmentId" (ngModelChange)="updateField('departmentId', +$event)"
-                    [error]="showErrors() ? validationErrors().departmentId : ''">
+                    [error]="showErrors() ? validationErrors().departmentId : ''" [disabled]="noWritePermission()">
                 </app-select-input>
             </div>
             <div>
                 <app-select-input label="Role" placeholder="Select Role" [options]="roles"
                     [ngModel]="selectedUser().roleId" (ngModelChange)="updateField('roleId', +$event)"
-                    [error]="showErrors() ? validationErrors().roleId : ''">
+                    [error]="showErrors() ? validationErrors().roleId : ''" [disabled]="noWritePermission()">
                 </app-select-input>
             </div>
         </div>
@@ -207,9 +207,9 @@
     <div modal-footer>
         <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button [title]="modalMode === 'add'
+        <app-button [title]="modalMode() === 'add'
                 ? 'Create User'
-                : 'Update User'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveUser()"
+                : 'Update User'" *ngIf="!noWritePermission()" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveUser()"
             customClass="mt-2">
         </app-button>
     </div>

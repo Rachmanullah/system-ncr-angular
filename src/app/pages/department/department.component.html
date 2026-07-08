@@ -59,7 +59,7 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button *appHasPermission="'UPDATE_DEPARTMENT'" (onClick)="openEditModal(item)" icon="square-pen"
+                                    <app-button *appHasPermission="'VIEW_DEPARTMENT'" (onClick)="openEditModal(item)" icon="square-pen"
                                         [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
@@ -103,7 +103,7 @@
         </div>
     </div>
 </div>
-<app-modal *ngIf="showModal" [title]="modalMode === 'add'
+<app-modal *ngIf="showModal" [title]="modalMode() === 'add'
         ? 'Add Department'
         : 'Edit Department'" size="lg" (close)="closeModal()">
     <div modal-body>
@@ -111,13 +111,13 @@
             <div>
                 <app-input label="Department Code" [ngModel]="selectedDepartment().departmentCode"
                     (ngModelChange)="updateField('departmentCode', $event)"
-                    [error]="showErrors() ? validationErrors().departmentCode : ''">
+                    [error]="showErrors() ? validationErrors().departmentCode : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
             <div>
                 <app-input label="Department Name" [ngModel]="selectedDepartment().departmentName"
                     (ngModelChange)="updateField('departmentName', $event)"
-                    [error]="showErrors() ? validationErrors().departmentName : ''">
+                    [error]="showErrors() ? validationErrors().departmentName : ''" [readonly]="noWritePermission()">
                 </app-input>
             </div>
         </div>
@@ -125,9 +125,9 @@
     <div modal-footer>
         <app-button title="Cancel" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button [title]="modalMode === 'add'
+        <app-button [title]="modalMode() === 'add'
                 ? 'Create Department'
-                : 'Update Department'" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveDepartment()"
+                : 'Update Department'" *ngIf="!noWritePermission()" icon="save" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="saveDepartment()"
             customClass="mt-2">
         </app-button>
     </div>

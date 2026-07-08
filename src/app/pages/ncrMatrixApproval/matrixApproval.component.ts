@@ -78,7 +78,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
     showModal = false;
     isLoading = true;
     submitting = false;
-    modalMode: 'add' | 'edit' = 'add';
+    modalMode= signal<'add' | 'edit'>('add');
     showErrors = signal(false);
     backendErrors = signal<Partial<Record<keyof NCRMatrixRequest, string>>>({});
     showApproverErrors = signal(false);
@@ -295,10 +295,18 @@ export class NCRMatrixApprovalComponent implements OnInit {
         }));
     }
 
+    noWritePermission = computed(() => {
+        const noWritePermission = this.modalMode() === 'add'
+            ? !this.authService.hasPermission('CREATE_MATRIX')
+            : !this.authService.hasPermission('UPDATE_MATRIX');
+
+        return noWritePermission;
+    });
+
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});
-        this.modalMode = 'add';
+        this.modalMode.set('add');
         this.selectedMatrix.set({
             ncrMatrixCode: generateMatrixNumber(''),
             departmentId: 0,
@@ -329,7 +337,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
         this.showErrors.set(false);
         this.backendErrors.set({});
         this.selectedMatrixId = matrix.ncrMatrixId;
-        this.modalMode = 'edit';
+        this.modalMode.set('edit');
         this.selectedMatrix.set({
             ncrMatrixCode: matrix.ncrMatrixCode,
             departmentId: matrix.departmentId,
@@ -360,7 +368,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
             }
             return;
         }
-        if (this.modalMode === 'add') {
+        if (this.modalMode() === 'add') {
             console.log('ADD MATRIX APPROVAL');
             this.matrixApprovalService.createMatrix(payload).subscribe({
                 next: (res) => {

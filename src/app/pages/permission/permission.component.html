@@ -31,18 +31,18 @@
             <div class="space-y-4">
                 <app-input label="Permission Code" [ngModel]="selectedPermission().permissionCode"
                     (ngModelChange)="updateField('permissionCode', $event)"
-                    [error]="showErrors() ? validationErrors().permissionCode : ''">
+                    [error]="showErrors() ? validationErrors().permissionCode : ''" [readonly]="noWritePermission()">
                 </app-input>
                 <app-input label="Permission Description" [ngModel]="selectedPermission().permissionDescription"
                     (ngModelChange)="updateField('permissionDescription', $event)"
-                    [error]="showErrors() ? validationErrors().permissionDescription : ''">
+                    [error]="showErrors() ? validationErrors().permissionDescription : ''" [readonly]="noWritePermission()">
                 </app-input>
                 <app-select-input label="Status" placeholder="Select Status" [options]="statusData"
                     [ngModel]="selectedPermission().isActive" (ngModelChange)="updateField('isActive', +$event)"
-                    [error]="showErrors() ? validationErrors().isActive : ''">
+                    [error]="showErrors() ? validationErrors().isActive : ''" [disabled]="noWritePermission()">
                 </app-select-input>
             </div>
-            <div class="flex gap-3 mt-6">
+            <div *ngIf="!noWritePermission()"  class="flex gap-3 mt-6">
                 <app-button [title]="formMode() === FormMode.CREATE ? 'Create' : 'Update'" icon="save"
                     [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="submitPermission()">
                 </app-button>

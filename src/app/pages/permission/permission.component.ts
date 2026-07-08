@@ -133,6 +133,14 @@ export class PermissionComponent implements OnInit {
         });
     }
 
+    noWritePermission = computed(() => {
+        const noWritePermission = this.formMode() === FormMode.CREATE
+            ? !this.authService.hasPermission('CREATE_PERMISSION')
+            : !this.authService.hasPermission('UPDATE_PERMISSION');
+
+        return noWritePermission;
+    });
+
     fetchNcr() {
         this.permissionService.getAllPermission().subscribe({
             next: (res) => {

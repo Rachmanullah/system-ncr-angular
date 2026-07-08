@@ -16,6 +16,7 @@ import { AuthBase } from "../../core/class/auth.class";
 import { UserService } from "../../service/user.service";
 import { AuthService } from "../../service/auth.service";
 import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class";
+import { HasPermissionDirective } from "../../helper/permissionDirective";
 
 @Component({
     selector: 'app-department',
@@ -28,7 +29,8 @@ import { SearchFilterPayload } from "../../core/class/searchFilterPayload.class"
         CircularProgressComponent,
         ModalComponent,
         BreadCrumbComponent,
-        SearchInputComponent
+        SearchInputComponent,
+        HasPermissionDirective
     ],
     templateUrl: './department.component.html',
 })
@@ -59,7 +61,7 @@ export class DepartmentComponent implements OnInit {
     currentPage = 1;
     itemsPerPage = 10;
     totalPages = 1;
-    modalMode: 'add' | 'edit' = 'add';
+    modalMode= signal<'add' | 'edit'>('add');
     showErrors = signal(false);
     backendErrors = signal<Partial<Record<keyof DepartmentRequest, string>>>({});
 
@@ -108,7 +110,7 @@ export class DepartmentComponent implements OnInit {
             this.department = data['departmentData'];
             this.isLoading = false;
             this.applyFilter('');
-        })
+        });
     }
 
     applyFilter(filter?: SearchFilterPayload | string | null) {
@@ -152,10 +154,17 @@ export class DepartmentComponent implements OnInit {
         });
     }
 
+    noWritePermission = computed(() => {
+        const noWritePermission = this.modalMode() === 'add'
+            ? !this.authService.hasPermission('CREATE_DEPARTMENT')
+            : !this.authService.hasPermission('UPDATE_DEPARTMENT');
+
+        return noWritePermission;
+    });
     openAddModal() {
         this.showErrors.set(false);
         this.backendErrors.set({});
-        this.modalMode = 'add';
+        this.modalMode.set('add');
         this.selectedDepartment.set({
             departmentCode: '',
             departmentName: ''
@@ -167,7 +176,7 @@ export class DepartmentComponent implements OnInit {
         this.showErrors.set(false);
         this.backendErrors.set({});
         this.selectedDepartmentId = department.departmentId;
-        this.modalMode = 'edit';
+        this.modalMode.set('edit');
         this.selectedDepartment.set({
             departmentCode: department.departmentCode,
             departmentName: department.departmentName
@@ -187,7 +196,7 @@ export class DepartmentComponent implements OnInit {
         if (!this.isFormValid()) {
             return;
         }
-        if (this.modalMode === 'add') {
+        if (this.modalMode() === 'add') {
             console.log('ADD DEPARTMENT');
             this.departmentService.createDepartment(payload).subscribe({
                 next: (res) => {
