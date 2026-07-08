@@ -26,9 +26,6 @@
             <table class="w-full text-sm text-left">
                 <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                     <tr>
-                        <th class="w-10 px-4 py-4">
-                            <input type="checkbox">
-                        </th>
                         <th class="px-6 py-4 font-semibold text-center">
                             Matrix Code
                         </th>
@@ -55,9 +52,6 @@
                     <ng-container *ngIf="!isLoading && filteredData.length > 0">
                         <tr *ngFor="let item of paginatedData"
                             class="border-b border-default hover:bg-neutral-secondary-medium transition">
-                            <td class="px-4 py-4">
-                                <input type="checkbox">
-                            </td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-heading text-center">
                                     {{ item.ncrMatrixCode }}
@@ -150,9 +144,6 @@
             <table class="w-full text-sm text-left">
                 <thead class="bg-neutral-secondary-medium border-b border-default-medium">
                     <tr>
-                        <th class="w-10 px-4 py-4">
-                            <input type="checkbox">
-                        </th>
                         <th class="px-6 py-4 font-semibold text-center">
                             Order Number
                         </th>
@@ -163,6 +154,12 @@
                             Approver Position
                         </th>
                         <th class="px-6 py-4 font-semibold text-center">
+                            Approver To
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
+                            Reject To
+                        </th>
+                        <th class="px-6 py-4 font-semibold text-center">
                             Action
                         </th>
                     </tr>
@@ -170,9 +167,6 @@
                 <ng-container *ngIf="!isLoading && selectedMatrix().approver.length > 0">
                     <tr *ngFor="let item of selectedMatrix().approver; let i = index"
                         class="border-b border-default hover:bg-neutral-secondary-medium transition">
-                        <td class="px-4 py-4 text-center">
-                            <input type="checkbox">
-                        </td>
                         <td class="px-4 py-4  text-center">
                             {{ item.orderNumber }}
                         </td>
@@ -181,6 +175,12 @@
                         </td>
                         <td class="px-4 py-4 text-center">
                             {{ getApproverPosition(item.approverId) }}
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            {{ item.approveToOrderNumber }}
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            {{ item.rejectToOrderNumber }}
                         </td>
                         <td class="px-4 py-4 justify-items-center">
                             <div class="flex items-center gap-4">
@@ -221,6 +221,18 @@
             (ngModelChange)="selectedApprover.update(x => ({
                 ...x,
                 orderNumber: +$event
+            }))">
+        </app-input>
+        <app-input type="number" label="Approve To Order Number" [ngModel]="selectedApprover().approveToOrderNumber"
+            (ngModelChange)="selectedApprover.update(x => ({
+                ...x,
+                approveToOrderNumber: +$event
+            }))">
+        </app-input>
+        <app-input type="number" label="Reject To Order Number" [ngModel]="selectedApprover().rejectToOrderNumber"
+            (ngModelChange)="selectedApprover.update(x => ({
+                ...x,
+                rejectToOrderNumber: +$event
             }))">
         </app-input>
     </div>

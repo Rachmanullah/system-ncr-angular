@@ -225,7 +225,7 @@ export class NCRMatrixApprovalComponent implements OnInit {
 
         this.selectedApprover.set({
             approverId: 0,
-            orderNumber: this.selectedMatrix().approver.length + 1
+            orderNumber: this.selectedMatrix().approver.length + 1,
         });
 
         this.showApproverModal = true;
@@ -239,7 +239,9 @@ export class NCRMatrixApprovalComponent implements OnInit {
 
         this.selectedApprover.set({
             approverId: approver.approverId,
-            orderNumber: approver.orderNumber
+            orderNumber: approver.orderNumber,
+            approveToOrderNumber: approver.approveToOrderNumber,
+            rejectToOrderNumber: approver.rejectToOrderNumber,
         });
 
         this.showApproverModal = true;
@@ -343,7 +345,9 @@ export class NCRMatrixApprovalComponent implements OnInit {
             departmentId: matrix.departmentId,
             approver: (matrix.approver ?? []).map((res: any) => ({
                 approverId: res.approverId,
-                orderNumber: res.orderNumber
+                orderNumber: res.orderNumber,
+                approveToOrderNumber: res.approveToOrderNumber,
+                rejectToOrderNumber: res.rejectToOrderNumber,
             })),
             status: matrix.status
         });
