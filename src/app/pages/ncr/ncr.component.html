@@ -14,7 +14,8 @@
             <div>
                 <app-search-input (search)="applyFilter($event)"></app-search-input>
             </div>
-            <app-button *appHasPermission="'CREATE_NCR'" title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY" (onClick)="openAddModal()">
+            <app-button *appHasPermission="'CREATE_NCR'" title="Add NCR" icon="plus" [variant]="BUTTON_VARIANTS.PRIMARY"
+                (onClick)="openAddModal()">
             </app-button>
         </div>
     </div>
@@ -98,14 +99,15 @@
                             </td>
                             <td class="px-6 py-4 justify-items-center">
                                 <div class="flex items-center gap-4">
-                                    <app-button *appHasPermission="'VIEW_NCR'" (onClick)="openEditModal(item)" icon="square-pen"
-                                        [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                    <app-button *appHasPermission="'VIEW_NCR'" (onClick)="openEditModal(item)"
+                                        icon="square-pen" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
                                         [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-yellow-500 text-yellow-600 hover:bg-yellow-50">
                                     </app-button>
 
-                                    <app-button *appHasPermission="'DELETE_NCR'" (onClick)="deleteNcr(item)" icon="trash-2" [size]="BUTTON_SIZES.SM"
-                                        [radius]="BUTTON_RADIUS.FULL" [variant]="BUTTON_VARIANTS.OUTLINE"
+                                    <app-button *appHasPermission="'DELETE_NCR'" (onClick)="deleteNcr(item)"
+                                        icon="trash-2" [size]="BUTTON_SIZES.SM" [radius]="BUTTON_RADIUS.FULL"
+                                        [variant]="BUTTON_VARIANTS.OUTLINE"
                                         customClass="border-red-500 text-red-600 hover:bg-red-50">
                                     </app-button>
                                 </div>
@@ -132,10 +134,12 @@
                 Total NCR: {{ ncrData.length }}
             </span>
             <div class="flex gap-2">
-                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1" title="Previous" icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage - 1)" disable="currentPage===1" title="Previous"
+                    icon="chevron-left" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
 
-                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages" title="Next" icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
+                <app-button (click)="changePage(currentPage + 1)" disable="currentPage===totalPages" title="Next"
+                    icon="chevron-right" [variant]="BUTTON_VARIANTS.OUTLINE">
                 </app-button>
             </div>
         </div>
@@ -243,7 +247,67 @@
             </ng-container>
             <ng-container *ngIf="activeTab() === 'attachment'">
                 <div class="p-4">
-                    Attachment Content
+                    <div class="flex items-center justify-between mb-3">
+                        <div *ngIf="!isReadonly()">
+                            <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)"
+                                [disabled]="uploadingFile()">
+                            <button type="button" (click)="fileInput.click()" [disabled]="uploadingFile()"
+                                class="inline-flex items-center gap-2 rounded-lg text-white bg-blue-600 px-4 py-2 font-medium shadow-sm transition-all duration-200 hover:bg-blue-600/90 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
+                                <span>
+                                    {{ uploadingFile() ? 'Uploading...' : 'Upload Attachment' }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border border-default rounded-lg overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-neutral-secondary-medium border-b border-default-medium">
+                                <tr>
+                                    <th class="px-4 py-3 font-semibold">File Name</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Size</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Uploaded</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let file of selectedAttachments"
+                                    class="border-b border-default hover:bg-neutral-secondary-medium transition">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="truncate max-w-xs" [title]="file.originalFileName">
+                                                {{ file.originalFileName }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-center text-body-muted">
+                                        {{ formatFileSize(file.fileSize) }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center text-body-muted">
+                                        {{ file.created | date: 'dd MMM yyyy' }}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-center gap-3">
+                                            <app-button icon="download" [size]="BUTTON_SIZES.SM"
+                                                [radius]="BUTTON_RADIUS.FULL" [variant]="BUTTON_VARIANTS.OUTLINE"
+                                                (onClick)="downloadAttachment(file)">
+                                            </app-button>
+                                            <app-button *ngIf="!isReadonly()" icon="trash-2" [size]="BUTTON_SIZES.SM"
+                                                [radius]="BUTTON_RADIUS.FULL" [variant]="BUTTON_VARIANTS.OUTLINE"
+                                                customClass="border-red-500 text-red-600 hover:bg-red-50"
+                                                (onClick)="removeAttachment(file)">
+                                            </app-button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="selectedAttachments.length === 0">
+                                    <td colspan="4" class="py-10 text-center text-body-muted">
+                                        No attachment uploaded yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </ng-container>
             <ng-container *ngIf="activeTab() === 'approval'">
@@ -355,7 +419,7 @@
                                                     {{ item.orderNumber }}
                                                 </div>
                                             </td>
-                                             <td class="px-6 py-4">
+                                            <td class="px-6 py-4">
                                                 <div class="font-medium text-heading text-center">
                                                     {{ item.date }}
                                                 </div>
@@ -405,9 +469,11 @@
     <div modal-footer>
         <app-button title="Back" [variant]="BUTTON_VARIANTS.OUTLINE" (onClick)="closeModal()" customClass="mr-2">
         </app-button>
-        <app-button *ngIf="modalMode() === 'edit' && !isReadonly()" title="Cancel" [variant]="BUTTON_VARIANTS.DANGER" customClass="mr-2" (onClick)="saveNcr('Cancel')">
+        <app-button *ngIf="modalMode() === 'edit' && !isReadonly()" title="Cancel" [variant]="BUTTON_VARIANTS.DANGER"
+            customClass="mr-2" (onClick)="saveNcr('Cancel')">
         </app-button>
-        <app-button *ngIf="!isReadonly() && canSubmit()" title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS" customClass="mr-2" (onClick)="saveNcr('Submit')">
+        <app-button *ngIf="!isReadonly() && canSubmit()" title="Submit" [variant]="BUTTON_VARIANTS.SUCCESS"
+            customClass="mr-2" (onClick)="saveNcr('Submit')">
         </app-button>
         <app-button *ngIf="!isReadonly()" [title]="modalMode() === 'add'
                 ? 'Create'

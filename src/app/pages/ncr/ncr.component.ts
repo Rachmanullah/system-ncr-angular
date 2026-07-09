@@ -8,7 +8,7 @@ import { BreadCrumbComponent } from '../../component/breadcrumb/breadcrumb';
 import { CircularProgressComponent } from '../../component/circularProgress/ciruclarProgress.component';
 import { BUTTON_RADIUS, BUTTON_SIZES, BUTTON_VARIANTS } from '../../constant/button.constant';
 import { ActivatedRoute } from '@angular/router';
-import { NCRBase, NCRDetailRequest, NCRLogsBase, NCRRequest } from '../../core/class/ncr.class';
+import { NCRAttachmentBase, NCRBase, NCRDetailRequest, NCRLogsBase, NCRRequest } from '../../core/class/ncr.class';
 import { NCRService } from '../../service/ncr.service';
 import { formatDate, formatDate2 } from '../../helper/dateFormat';
 import { selectInput } from '../../core/class/selectInput.class';
@@ -25,6 +25,7 @@ import { NCRMatrixBase } from '../../core/class/matrix.class';
 import { HasPermissionDirective } from '../../helper/permissionDirective';
 import { SearchInputComponent } from '../../component/searchInput/searchInput';
 import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class';
+import { NCRAttachmentService } from '../../service/ncrAttachment.service';
 
 @Component({
     selector: 'app-ncr',
@@ -41,7 +42,7 @@ import { SearchFilterPayload } from '../../core/class/searchFilterPayload.class'
         TabsComponent,
         TextareaComponent,
         HasPermissionDirective,
-        SearchInputComponent
+        SearchInputComponent,
     ],
     templateUrl: './ncr.component.html',
 })
@@ -52,6 +53,7 @@ export class NCRComponent implements OnInit {
 
     constructor(
         private ncrService: NCRService,
+        private ncrAttachmentService: NCRAttachmentService,
         private authService: AuthService,
         private cdr: ChangeDetectorRef,
     ) { }
@@ -73,7 +75,7 @@ export class NCRComponent implements OnInit {
         roleName: ''
     };
     ncrData: NCRBase[] = [];
-    filteredData: NCRBase[]=[];
+    filteredData: NCRBase[] = [];
     ncrMatrixData: NCRMatrixBase[] = [];
     selectMatrixData: NCRMatrixBase = {
         ncrMatrixId: 0,
@@ -110,11 +112,13 @@ export class NCRComponent implements OnInit {
         statusName: '',
         detail: {} as NCRDetailRequest,
     });
-    selectedNcrLogs : NCRLogsBase[] = [];
+    selectedNcrLogs: NCRLogsBase[] = [];
+    selectedAttachments: NCRAttachmentBase[] = [];
+    uploadingFile = signal(false);
     showModal = false;
     isLoading = true;
     submitting = false;
-    modalMode= signal<'add' | 'edit'>('add');
+    modalMode = signal<'add' | 'edit'>('add');
     showErrors = signal(false);
     backendErrors = signal<Record<string, string>>({});
     showApproverErrors = signal(false);
@@ -122,7 +126,7 @@ export class NCRComponent implements OnInit {
     currentPage = 1;
     itemsPerPage = 10;
     totalPages = 1;
-    
+
     tabs: TabItem[] = [
         {
             id: 'detail',
@@ -226,6 +230,7 @@ export class NCRComponent implements OnInit {
     canSubmit = computed(() => this.authService.hasPermission('SUBMIT_NCR'));
     loadData() {
         this.route.data.subscribe((data) => {
+            console.log(JSON.stringify(data['ncrData']))
             this.ncrData = (data['ncrData'] ?? []).filter((ncr: NCRBase) => {
                 if (this.isAdministrator()) {
                     return true;
@@ -262,55 +267,55 @@ export class NCRComponent implements OnInit {
         });
     }
 
-    findMatrixNcr(departmentId: number){
-        console.log("departmentId : ",departmentId);
+    findMatrixNcr(departmentId: number) {
+        console.log("departmentId : ", departmentId);
         const result = this.ncrMatrixData.find(res => res.departmentId == departmentId);
         if (result) {
             console.log("matrix :", true);
             this.selectMatrixData = {
                 ncrMatrixId: result.ncrMatrixId,
                 ncrMatrixCode: result.ncrMatrixCode,
-                departmentId : result.departmentId,
+                departmentId: result.departmentId,
                 departmentCode: result.departmentCode,
                 departmentName: result.departmentName,
                 status: result.status,
                 approver: result.approver
             }
-        }else{
+        } else {
             console.log("matrix :", false);
         }
     }
 
     applyFilter(filter?: SearchFilterPayload | string | null) {
-            let searchText = '';
-    
-            if (typeof filter === 'string') {
-                searchText = filter;
-            } else {
-                searchText = filter?.text ?? '';
-            }
-            const text = searchText.toLowerCase();
-            this.filteredData = this.ncrData.filter(a =>
-                (a.ncrNumber ?? '').toLowerCase().includes(text) ||
-                (a.departmentName ?? '').toLowerCase().includes(text) ||
-                (a.ncrCategory ?? '').toLowerCase().includes(text) ||
-                (a.ncrProject ?? '').toLowerCase().includes(text) ||
-                (a.ncrTitle ?? '').toLowerCase().includes(text) ||
-                (a.requestorName ?? '').toLowerCase().includes(text)
-            );
-            this.currentPage = 1;
-            this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+        let searchText = '';
+
+        if (typeof filter === 'string') {
+            searchText = filter;
+        } else {
+            searchText = filter?.text ?? '';
         }
-    
-        get paginatedData() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.filteredData.slice(start, start + this.itemsPerPage);
-        }
-    
-        changePage(page: number) {
-            if (page < 1 || page > this.totalPages) return;
-            this.currentPage = page;
-        }
+        const text = searchText.toLowerCase();
+        this.filteredData = this.ncrData.filter(a =>
+            (a.ncrNumber ?? '').toLowerCase().includes(text) ||
+            (a.departmentName ?? '').toLowerCase().includes(text) ||
+            (a.ncrCategory ?? '').toLowerCase().includes(text) ||
+            (a.ncrProject ?? '').toLowerCase().includes(text) ||
+            (a.ncrTitle ?? '').toLowerCase().includes(text) ||
+            (a.requestorName ?? '').toLowerCase().includes(text)
+        );
+        this.currentPage = 1;
+        this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+
+    get paginatedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filteredData.slice(start, start + this.itemsPerPage);
+    }
+
+    changePage(page: number) {
+        if (page < 1 || page > this.totalPages) return;
+        this.currentPage = page;
+    }
 
     openAddModal() {
         this.showErrors.set(false);
@@ -336,6 +341,7 @@ export class NCRComponent implements OnInit {
             detail: {} as NCRDetailRequest
         });
         this.findMatrixNcr(Number(this.user.departmentId));
+        this.selectedAttachments = [];
         this.showModal = true;
     }
 
@@ -371,11 +377,12 @@ export class NCRComponent implements OnInit {
                 financialImpact: item.ncrDetail.financialImpact
             }
         });
-        this.selectedNcrLogs = (item.ncrLogs ?? [] ).map((res) => ({
+        this.selectedNcrLogs = (item.ncrLogs ?? []).map((res) => ({
             ...res,
             date: formatDate(res.date) ?? ''
-        }));    
+        }));
         this.findMatrixNcr(item.departmentId);
+        this.selectedAttachments = item.ncrAttachment ?? [];
         this.showModal = true;
     }
 
@@ -387,7 +394,10 @@ export class NCRComponent implements OnInit {
         this.isLoading = true;
         const payload = {
             ...this.selectedNcr(),
-            action: action
+            action: action,
+            attachment: this.selectedAttachments.map(a => ({
+                ncrAttachmentId: a.ncrAttachmentId
+            }))
         };
         this.updateField("action", action);
         console.log("payload : ", JSON.stringify(payload));
@@ -398,7 +408,7 @@ export class NCRComponent implements OnInit {
             this.isLoading = false;
             return;
         }
-        if(this.selectMatrixData.ncrMatrixId == 0 && action == 'Submit'){
+        if (this.selectMatrixData.ncrMatrixId == 0 && action == 'Submit') {
             this.isLoading = false;
             Swal.fire('Warning', 'Matrix Approval Not Found For Department', 'warning');
             return;
@@ -493,5 +503,84 @@ export class NCRComponent implements OnInit {
                 })
             }
         })
+    }
+
+    onFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+
+        const maxSizeMb = 10;
+        if (file.size > maxSizeMb * 1024 * 1024) {
+            Swal.fire('Error', `File size exceeds ${maxSizeMb}MB limit`, 'error');
+            input.value = '';
+            return;
+        }
+
+        this.uploadingFile.set(true);
+        this.ncrAttachmentService.uploadNcrAttachment(file).subscribe({
+            next: (res) => {
+                this.selectedAttachments = [...this.selectedAttachments, res.data];
+                this.uploadingFile.set(false);
+            },
+            error: (err) => {
+                this.uploadingFile.set(false);
+                Swal.fire('Error', err?.error?.message || 'Upload failed', 'error');
+            },
+            complete: () => {
+                input.value = '';
+            }
+        });
+    }
+
+    downloadAttachment(attachment: NCRAttachmentBase) {
+        this.ncrAttachmentService.downloadNcrAttachment(attachment.ncrAttachmentId).subscribe({
+            next: (blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = attachment.originalFileName;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err) => {
+                Swal.fire('Error', 'Failed to download file', 'error');
+            }
+        });
+    }
+
+    removeAttachment(attachment: NCRAttachmentBase) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Remove attachment ${attachment.originalFileName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, remove it!'
+        }).then(result => {
+            if (result.isConfirmed) {
+                this.ncrAttachmentService.deleteNcrAttachment(attachment.ncrAttachmentId).subscribe({
+                    next: () => {
+                        this.selectedAttachments = this.selectedAttachments
+                            .filter(a => a.ncrAttachmentId !== attachment.ncrAttachmentId);
+                    },
+                    error: (err) => {
+                        Swal.fire('Error', err?.error?.message || 'Failed to remove', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    formatFileSize(bytes: number): string {
+        if (!bytes) return '0 B';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let size = bytes;
+        let unitIndex = 0;
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        return `${size.toFixed(1)} ${units[unitIndex]}`;
     }
 }

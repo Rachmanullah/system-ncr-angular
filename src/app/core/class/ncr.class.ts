@@ -17,6 +17,7 @@ export interface NCRBase {
     runningNumber           : number;
     approver?               : number;
     ncrDetail               : NCRDetailBase;
+    ncrAttachment?          : NCRAttachmentBase[];
     ncrLogs                 : NCRLogsBase[];
 }
 
@@ -49,6 +50,7 @@ export interface NCRRequest {
     statusName              : string;
     approver?               : number;
     detail                  : NCRDetailRequest;
+    attachment?             : NCRAttachmentRequest[];
 }
 
 export interface NCRDetailRequest {
@@ -69,4 +71,17 @@ export interface NCRLogsBase {
     date?                    : string;
     username?                : string;
     userPosition?            : string;
+}
+
+export interface NCRAttachmentBase{
+    ncrAttachmentId         : number;
+    ncrId?                  : number;
+    fileName                : string;
+    fileSize                : number;
+    originalFileName        : string;
+    created                 : string;
+}
+
+export interface NCRAttachmentRequest {
+    ncrAttachmentId: number;
 }
